@@ -1,6 +1,23 @@
 import pandas as pd
 import random
+import json
 #from tabulate import tabulate
+
+def prepareDFForCell(table):
+    # Check if the input is a pandas DataFrame
+    if not isinstance(table, pd.DataFrame):
+        raise ValueError("Input must be a pandas DataFrame")
+    
+    json_str = ""
+    
+    for row in table.itertuples(index=False):
+        # Convert the row to a dictionary
+        row_dict = row._asdict()
+        
+        json_str += json.dumps(row_dict) + "\n"
+    
+    return json_str.strip()  # Remove the trailing newline if present
+    
 
 def getTableString(table):
     return table.to_json(orient='records', lines=True)
