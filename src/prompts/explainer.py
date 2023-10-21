@@ -12,7 +12,7 @@ Now, this is the format you need to output:
 Hello, I'm MapGPT.
 I investigated the table and made this changes in the table to reformat it.
 
-##Column Mapping
+## Column Mapping
 
 Is this mapping appropriate for you?
 """

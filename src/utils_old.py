@@ -3,8 +3,7 @@ import random
 import json
 #from tabulate import tabulate
 
-def prepareDFForCell(table, index=-1,count=None):
-    table = getTable(table, index, count)
+def prepareDFForCell(table):
     # Check if the input is a pandas DataFrame
     if not isinstance(table, pd.DataFrame):
         raise ValueError("Input must be a pandas DataFrame")
@@ -24,7 +23,8 @@ def getTableString(table):
     return table.to_json(orient='records', lines=True)
     #tabulate(table, headers='keys', tablefmt='psql', showindex=False)
 
-def getTable(df, index=-1,count=None):
+def getTable(path, index=-1,count=None):
+    df = pd.read_csv(path, index_col=False)
     if count is None:
         return df
     return df.iloc[index:index+count,:]
@@ -39,14 +39,14 @@ def dict2row(dict):
 
     return pd.DataFrame.from_dict(new_dict)
     
-def getColumns(df):
-    return df.columns
+def getColumns(path):
+    return getTable(path).columns
 
-def getRowDF(table, index):
-    return table.iloc[index:index+1]
+def getRowDF(path, index):
+    return getTable(path).iloc[index:index+1]
     
-def getRow(table, index):
-    row = table.iloc[index].to_list()
+def getRow(path, index):
+    row = getTable(path).iloc[index].to_list()
     return ' '.join([str(item) for item in row])
 
 def getRandomIndices(n, percentage=0.8):
@@ -66,11 +66,12 @@ Elements:{' '.join(new_row)}
 JSON:{json_row}
     """
 
-def getExamples(table, count=3, percentage=0.8):
+def getExamples(path, count=3, percentage=0.8):
     examples = ""
-    columns = table.columns.to_list()
+    data = pd.read_csv(path, index_col=False)
+    columns = data.columns.to_list()
     for i in range(count):
-        example = getExample(table.iloc[i],columns, percentage)
+        example = getExample(data.iloc[i],columns, percentage)
         examples += example+"\n"
     return examples, columns
 

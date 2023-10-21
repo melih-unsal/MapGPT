@@ -7,8 +7,9 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts.chat import (ChatPromptTemplate,
                                     HumanMessagePromptTemplate,
                                     SystemMessagePromptTemplate)
-import prompts
-from utils import getTableString
+from pathlib import Path
+from src.utils import getExamples, getRow, dict2row, getRowDF, getTable, getTableString, prepareDFForCell
+from src import prompts
 import ast
 
 class BaseModel:
@@ -138,8 +139,65 @@ class FinalizerModel(BaseModel):
         return pd.DataFrame.from_dict(res)
     
 class ModelManager:
-    def __init__(self):
-        self.row_model = RowModel()
-        self.cell_model = CellModel()
-        self.finalizer_model = FinalizerModel()
-        self.FEW_SHOT_EXAMPLE_COUNTS={}
+    def __init__(self, source, 
+                 target,
+                    model_name, 
+                    openai_api_key, 
+                    openai_api_base):
+        self.source = source
+        self.target = target
+        self.row_model = RowModel(model_name=model_name, 
+                                  openai_api_key=openai_api_key, 
+                                  openai_api_base=openai_api_base)
+        self.cell_model = CellModel(model_name=model_name, 
+                                    openai_api_key=openai_api_key, 
+                                    openai_api_base=openai_api_base)
+        self.explainer_model = ExplainerModel(model_name=model_name, 
+                                              openai_api_key=openai_api_key, 
+                                              openai_api_base=openai_api_base)
+        self.applier_model = ApplierModel(model_name=model_name, 
+                                          openai_api_key=openai_api_key, 
+                                          openai_api_base=openai_api_base)
+        self.ROW_MODEL_FEW_SHOT_COUNT = 6 # it is the few shot example count for row model 
+        self.ROW_MODEL_PERCENTAGE = 0.4
+        self.CELL_MODEL_EXAMPLES_COUNT = 5
+    
+        
+    def getConfirmationMessage(self):
+        examples, self.target_columns = getExamples(self.target,
+                                        self.ROW_MODEL_FEW_SHOT_COUNT,
+                                        self.ROW_MODEL_PERCENTAGE)
+        
+        source_first_row_str = getRow(self.source,0)
+        self.transformed_source_first_row_json = self.row_model(examples=examples, columns=self.target_columns, row=source_first_row_str)
+        transformed_source_first_row_df = dict2row(self.transformed_source_first_row_json)
+        row = getRowDF(self.source,0)
+        source_fst_row_str_in_table = getTableString(row)
+        transformed_source_fst_row_str_in_table = getTableString(transformed_source_first_row_df)
+        
+        return self.explainer_model(row1=source_fst_row_str_in_table, 
+                                    row2=transformed_source_fst_row_str_in_table)
+    
+    def run(self):
+        confirmation = self.getConfirmationMessage()
+        
+        yield confirmation
+        
+        reformatted_row_json = self.cell_model(table1=self.transformed_source_first_row_json,
+                                               table2=prepareDFForCell(self.target,0,self.CELL_MODEL_EXAMPLES_COUNT),
+                                               columns=self.target_columns)
+        
+        for col in self.target_columns:
+            if not self.transformed_source_first_row_json.get(col):
+                reformatted_row_json[col] = {0:""}
+            else:
+                reformatted_row_json[col] = {0:reformatted_row_json[col]}
+        
+        final_table = self.applier_model(
+            source_json=getRowDF(self.source,0).to_dict(),
+            target_json=reformatted_row_json,
+            dataframe_json=getTable(self.source).to_dict()
+        )
+        
+        yield final_table
+                
