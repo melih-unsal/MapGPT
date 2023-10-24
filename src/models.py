@@ -123,6 +123,8 @@ class ApplierModel(BaseModel):
                          )
         
     def refine(self, res):
+        """In case the generated JSON is not valid.
+        """
         max_count = 0
         for v in res.values():
             count = len(v)
@@ -140,11 +142,7 @@ class ApplierModel(BaseModel):
         
     def __call__(self, **kwargs):
         res = super().__call__(**kwargs)
-        print("before refine")
-        print(res)
         res = self.refine(res)
-        print("after refine")
-        print(res)
         return pd.DataFrame.from_dict(res)
     
 class FeedbackRowModel(BaseModel):
