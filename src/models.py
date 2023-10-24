@@ -1,7 +1,6 @@
 import os
 import json
 import pandas as pd
-from termcolor import colored
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts.chat import (ChatPromptTemplate,
@@ -43,7 +42,6 @@ class BaseModel:
         res = self.chain.run(**kwargs)
         if is_json:
             res = ast.literal_eval(res)
-        print(colored(res,"blue"))
         return res
 
 class RowModel(BaseModel):
@@ -62,7 +60,6 @@ class RowModel(BaseModel):
         
     def __call__(self, **kwargs):
         new_row = super().__call__(**kwargs)
-        print(colored(new_row,"green"))
         new_row = {k:v for k, v in new_row.items() if v}
         target_columns = kwargs.get('columns')
         for col in target_columns:
@@ -105,16 +102,10 @@ class ColumnMappingsModel(BaseModel):
     def __call__(self, **kwargs):
         array1 = kwargs["array1"]
         array2 = kwargs["array2"]
-        print("df1:")
-        print(array1)
-        print("df2:")
-        print(array2)
         kwargs["array1"] = array1.iloc[0].values
         kwargs["array2"] = array2.iloc[0].values
         res = super().__call__(self, **kwargs)
         res = getMappingFromRowResult(res, array1, array2)
-        print("res:")
-        print(res)
         return res
         
 class ApplierModel(BaseModel):
@@ -313,12 +304,8 @@ class ModelManager:
         return self.mappings
         
     def getTable(self, gt_row=None):
-        print("before:")
-        print(gt_row)
         if gt_row is None:
             gt_row = self.transformed_df   
-        print("after:")
-        print(gt_row)
         first_row = gt_row.iloc[0]
         json_str = first_row.to_json()
         target_json = json.loads(json_str)
