@@ -7,10 +7,9 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts.chat import (ChatPromptTemplate,
                                     HumanMessagePromptTemplate,
                                     SystemMessagePromptTemplate)
-from pathlib import Path
 from src.utils import (getExamples, getRow, dict2row, getRowDF, 
-                       getTable, getTableString, prepareDFForCell, 
-                       getTargetCols, getMappingFromRowResult, getColumnGroups)
+                       getTableString, prepareDFForCell, 
+                       getMappingFromRowResult, getColumnGroups)
 from src import prompts
 import ast
 import math
