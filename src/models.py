@@ -122,8 +122,29 @@ class ApplierModel(BaseModel):
                          human_template = prompts.applier.human_template
                          )
         
+    def refine(self, res):
+        max_count = 0
+        for v in res.values():
+            count = len(v)
+            max_count = max(max_count, count)
+        
+        for k,v in res.items():
+            extra = max_count - len(v)
+            if extra > 0:
+                extra_items = extra * ['']
+                v += extra_items
+                res[k] = v
+        
+        return res
+                  
+        
     def __call__(self, **kwargs):
         res = super().__call__(**kwargs)
+        print("before refine")
+        print(res)
+        res = self.refine(res)
+        print("after refine")
+        print(res)
         return pd.DataFrame.from_dict(res)
     
 class FeedbackRowModel(BaseModel):
