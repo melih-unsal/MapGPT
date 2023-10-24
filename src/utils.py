@@ -1,7 +1,6 @@
 import pandas as pd
 import random
 import json
-from tabulate import tabulate
 import functools
 import operator
 
@@ -104,7 +103,6 @@ def getTableString(df):
     no_empty_str_cols = df.columns[~df.apply(lambda col: col.astype(str).eq('').any())]
     df = df[no_empty_str_cols]
     return df.to_json(orient='records', lines=True)
-    #return tabulate(df, headers='keys', tablefmt='psql', showindex=False)
 
 def getTable(df, index=-1,count=None):
     if count is None:
