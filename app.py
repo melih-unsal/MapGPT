@@ -39,8 +39,8 @@ main_process, tables = st.columns(2)
 
 with main_process:
     with st.form("mapgpt"):
-        source_file = st.file_uploader("Choose Source CSV")
-        target_file = st.file_uploader("Choose Target CSV")
+        source_file = st.file_uploader("Choose Source CSV/Excel", type=["csv","xlsx"])
+        target_file = st.file_uploader("Choose Target CSV/Excel", type=["csv","xlsx"])
         
         submitted = st.form_submit_button(label='Submit')
         
@@ -54,9 +54,15 @@ with main_process:
             if not target_file:
                 st.warning("Please upload the target file", icon="⚠️")
                 st.stop()
-                
-            st.session_state.source = pd.read_csv(source_file, index_col=False)
-            st.session_state.target = pd.read_csv(target_file, index_col=False)
+            if source_file.name.endswith(".csv"):
+                st.session_state.source = pd.read_csv(source_file, index_col=False)
+            else:
+                st.session_state.source = pd.read_excel(source_file, index_col=False)
+            
+            if target_file.name.endswith(".csv"):
+                st.session_state.target = pd.read_csv(target_file, index_col=False)
+            else:
+                st.session_state.target = pd.read_excel(target_file, index_col=False)
             
             st.session_state.agent = ModelManager(model_name, 
                                                 openai_api_key, 
