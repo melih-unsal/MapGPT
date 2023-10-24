@@ -154,6 +154,29 @@ class FeedbackRowModel(BaseModel):
         columns = kwargs.get('columns', [])
         return {k:v for k,v in res.items() if k in columns}
     
+class FeedbackCellModel(BaseModel):
+    """By looking at the feedback coming from the user for the first row, generate the refined version.
+    """
+    def __init__(self, model_name="gpt-3.5-turbo", 
+                 openai_api_key = os.getenv("OPENAI_API_KEY",""),
+                 openai_api_base=""):
+        super().__init__(model_name, 
+                         openai_api_key, 
+                         openai_api_base,
+                         system_template = prompts.feedback_cell.system_template,
+                         human_template = prompts.feedback_cell.human_template
+                         )
+        
+    def __call__(self, **kwargs):
+        res = super().__call__(self, **kwargs)
+        columns = kwargs["columns"]
+        for col in columns:
+            if col not in res:
+                res[col] = ""
+        for k,v in res.items():
+            res[k] = [v]
+        return pd.DataFrame.from_dict(res)
+    
 class ModelManager:
     def __init__(self,
                  model_name, 
@@ -175,7 +198,11 @@ class ModelManager:
                                           openai_api_key=openai_api_key, 
                                           openai_api_base=openai_api_base)
         
-        self.feedback_model = FeedbackRowModel(model_name=model_name, 
+        self.feedback_row_model = FeedbackRowModel(model_name=model_name, 
+                                               openai_api_key=openai_api_key, 
+                                               openai_api_base=openai_api_base)
+        
+        self.feedback_cell_model = FeedbackCellModel(model_name=model_name, 
                                                openai_api_key=openai_api_key, 
                                                openai_api_base=openai_api_base)
         self.source = source
@@ -214,7 +241,7 @@ class ModelManager:
             self.original_columns = self.target.columns
             self.target, self.identical_columns = getColumnGroups(self.target)
         
-    def getConfirmationMessage(self):
+    def getConfirmationMessage_old(self):
         self.examples, self.target_columns = getExamples(self.target,
                                         self.ROW_MODEL_FEW_SHOT_COUNT,
                                         self.ROW_MODEL_PERCENTAGE)
@@ -229,9 +256,34 @@ class ModelManager:
         self.mappings = self.column_mappings_model(array1=row, 
                                     array2=transformed_source_first_row_df)
         return self.mappings
+    
+    def getConfirmationMessage(self):
+        self.examples, self.target_columns = getExamples(self.target,
+                                        self.ROW_MODEL_FEW_SHOT_COUNT,
+                                        self.ROW_MODEL_PERCENTAGE)
         
-    def refine(self, feedback):
-        self.transformed_source_first_row_json = self.feedback_model(columns=self.target_columns, 
+        self.source_first_row_str = getRow(self.source,0)
+        self.transformed_source_first_row_json = self.row_model(examples=self.examples, columns=self.target_columns, row=self.source_first_row_str)
+        reformatted_row_json = self.cell_model(table1=self.transformed_source_first_row_json,
+                                               table2=prepareDFForCell(self.target,0,self.CELL_MODEL_EXAMPLES_COUNT),
+                                               columns=self.target_columns)
+        for col in self.target_columns:
+            if not self.transformed_source_first_row_json.get(col):
+                reformatted_row_json[col] = ""
+        transformed_df = dict2row(reformatted_row_json)
+        for k,cols in self.identical_columns.items():
+            for col in cols:
+                if col not in transformed_df.columns:
+                    transformed_df[col] = transformed_df[k]
+        self.transformed_df = transformed_df[self.original_columns]
+        row = getRowDF(self.source,0)
+        return {
+            "previous":row,
+            "after":self.transformed_df
+        }
+        
+    def refine_old(self, feedback):
+        self.transformed_source_first_row_json = self.feedback_row_model(columns=self.target_columns, 
                                                                      source_json=self.source.iloc[0].to_json(),
                                                                      result_json=self.transformed_source_first_row_json,
                                                                      relations=self.mappings,
@@ -245,21 +297,35 @@ class ModelManager:
                                            array2=transformed_source_first_row_df)
 
         return self.mappings
+    
+    def refine(self, feedback):
+        self.transformed_source_first_row_json = self.feedback_cell_model(columns=self.target_columns, 
+                                                                     source_json=self.source.iloc[0].to_json(),
+                                                                     result_json=self.transformed_source_first_row_json,
+                                                                     feedback=feedback)
+        transformed_source_first_row_df = dict2row(self.transformed_source_first_row_json)
+        row = getRowDF(self.source,0)
+        source_fst_row_str_in_table = getTableString(row)
+        transformed_source_fst_row_str_in_table = getTableString(transformed_source_first_row_df)
+        self.stage = 1
+        self.mappings = self.column_mappings_model(array1=row, 
+                                                   array2=transformed_source_first_row_df)
+
+        return self.mappings
         
-    def getTable(self):       
-        reformatted_row_json = self.cell_model(table1=self.transformed_source_first_row_json,
-                                               table2=prepareDFForCell(self.target,0,self.CELL_MODEL_EXAMPLES_COUNT),
-                                               columns=self.target_columns)
-        for col in self.target_columns:
-            if not self.transformed_source_first_row_json.get(col):
-                reformatted_row_json[col] = {0:""}
-            else:
-                reformatted_row_json[col] = {0:reformatted_row_json[col]}
-                
-        #source_json = {k:v for k,v in getRowDF(self.source,0).to_dict().items() if k in self.mappings}
+    def getTable(self, gt_row=None):
+        print("before:")
+        print(gt_row)
+        if gt_row is None:
+            gt_row = self.transformed_df   
+        print("after:")
+        print(gt_row)
+        first_row = gt_row.iloc[0]
+        json_str = first_row.to_json()
+        target_json = json.loads(json_str)
+        target_json = {k:v for k,v in target_json.items() if k in self.target.columns}    
+
         source_json = getRowDF(self.source,0).to_dict()
-        target_cols = getTargetCols(self.mappings)
-        target_json = {k:v for k,v in reformatted_row_json.items() if k in target_cols or k in self.target.columns}
         
         combined_table = pd.DataFrame(columns=self.target.columns)
         
@@ -279,5 +345,6 @@ class ModelManager:
             for col in cols:
                 if col not in combined_table.columns:
                     combined_table[col] = combined_table[k]
+        combined_table.fillna("",inplace=True)
         yield combined_table[self.original_columns], 100
         self.stage = 2                

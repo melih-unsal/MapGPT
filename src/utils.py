@@ -118,7 +118,7 @@ def dict2row(dict):
             new_dict[k] = v
         else:
             new_dict[k] = [v]
-
+            
     return pd.DataFrame.from_dict(new_dict)
     
 def getColumns(df):

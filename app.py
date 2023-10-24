@@ -82,41 +82,26 @@ if st.session_state.get("source") is not None and st.session_state.get("target")
             st.session_state.confirmation =  st.session_state.agent.getConfirmationMessage()  
             st.session_state.stage = 1
     if st.session_state.get("confirmation"):
-        st.json(st.session_state.confirmation)
-        if st.session_state.stage == 3:
-            st.info("Hi, again me. According to your feedback, i updated the mapping. Is it okay now")
-        else:
-            st.info("Hi, I'm MapGPT. According to the source and target tables, i created the following mapping. Is it okay for you?") 
-        col1, col2 = st.columns(2)
-        with col1:
-            yes = st.button("Yes")
-        with col2:
-            no = st.button("No") 
+        previous = st.session_state.confirmation["previous"]
+        after = st.session_state.confirmation["after"]
+        st.subheader("Original Row")
+        st.dataframe(previous)
+        st.subheader("✏️Transformed Row")
+        st.session_state.edited_row = st.data_editor(after)
+        st.info("""Greetings from MapGPT. Based on the provided source and target tables, I've made adjustments to the initial row. Please take a moment to review the table. If you wish to make corrections, simply click on any cell to modify its contents. Once you're satisfied with the updates, kindly click the 'Submit' button to finalize your changes. If no corrections are required, you may proceed by pressing 'Submit' directly.""") 
 
-else:
-    yes = no = False  
+if st.session_state.get("stage") == 1:
+    finalize_table = st.button("Submit")
         
-if yes:
-    progress_text = "Table is being reformatted..."
-    progress_bar = st.progress(0, text=progress_text)
-    data = None
-    for data, percentage in st.session_state.agent.getTable():
-        progress_bar.progress(percentage, text=progress_text)
-    st.session_state.table = data 
-    st.session_state.stage = -1
-    st.rerun()
-if no:
-    print("no pressed")
-    st.session_state.stage = 2
-
-
-if st.session_state.get("stage") == 2:
-    feedback = st.text_area("Give feedback")
-    if st.button("Refine"):
-        with st.spinner("Refining the mapping..."):
-            st.session_state.confirmation = st.session_state.agent.refine(feedback)    
-            st.session_state.stage = 3
-            st.rerun()
+    if finalize_table:
+        progress_text = "Table is being reformatted..."
+        progress_bar = st.progress(0, text=progress_text)
+        data = None
+        for data, percentage in st.session_state.agent.getTable(st.session_state.edited_row):
+            progress_bar.progress(percentage, text=progress_text)
+        st.session_state.table = data 
+        st.session_state.stage = -1
+        st.rerun()
 
 if st.session_state.get("stage") == -1 and st.session_state.get("table") is not None:   
     st.subheader("Final Table") 
