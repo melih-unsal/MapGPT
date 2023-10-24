@@ -167,6 +167,76 @@ class FeedbackCellModel(BaseModel):
             res[k] = [v]
         return pd.DataFrame.from_dict(res)
     
+class Json2ParagraphModel(BaseModel):
+    """By looking at the feedback coming from the user for the first row, generate the refined version.
+    """
+    def __init__(self, model_name="gpt-3.5-turbo", 
+                 openai_api_key = os.getenv("OPENAI_API_KEY",""),
+                 openai_api_base=""):
+        super().__init__(model_name, 
+                         openai_api_key, 
+                         openai_api_base,
+                         system_template = prompts.json2paragraph.system_template,
+                         human_template = prompts.json2paragraph.human_template
+                         )
+        
+    def __call__(self, **kwargs):
+        return super().__call__(is_json=False,**kwargs)
+        
+class Paragraph2JsonModel(BaseModel):
+    """By looking at the feedback coming from the user for the first row, generate the refined version.
+    """
+    def __init__(self, model_name="gpt-3.5-turbo", 
+                 openai_api_key = os.getenv("OPENAI_API_KEY",""),
+                 openai_api_base=""):
+        super().__init__(model_name, 
+                         openai_api_key, 
+                         openai_api_base,
+                         system_template = prompts.paragraph2json.system_template,
+                         human_template = prompts.paragraph2json.human_template
+                         )
+    
+class RefinerModel(BaseModel):
+    """By looking at the feedback coming from the user for the first row, generate the refined version.
+    """
+    def __init__(self, model_name="gpt-3.5-turbo", 
+                 openai_api_key = os.getenv("OPENAI_API_KEY",""),
+                 openai_api_base=""):
+        super().__init__(model_name, 
+                         openai_api_key, 
+                         openai_api_base,
+                         system_template = prompts.refiner.system_template,
+                         human_template = prompts.refiner.human_template
+                         )
+        self.paragraph2json_model = Paragraph2JsonModel(model_name, 
+                                                        openai_api_key, 
+                                                        openai_api_base)
+        self.json2paragraph_model = Json2ParagraphModel(model_name, 
+                                                        openai_api_key, 
+                                                        openai_api_base)
+        
+    def __call__(self, source_json, target_json, intermediate_json):
+        missing_keys = [k for k,v in intermediate_json.items() if not v]
+        target_paragraph =  self.json2paragraph_model(data=target_json)
+        target_json = {k:target_json[k] for k in missing_keys}
+        non_missing_source_json = {k:v for k,v in source_json.items() if v}
+        source_paragraph = self.json2paragraph_model(data=non_missing_source_json)
+        
+        try:
+            new_source_json = self.paragraph2json_model(target_paragraph=target_paragraph,
+                                                        target_json=target_json,
+                                                        source_paragraph=source_paragraph,
+                                                        columns=missing_keys)
+            for k,v in new_source_json.items():
+                if v:
+                    intermediate_json[k] = v
+        except Exception as e:
+            print(e)
+            
+        return intermediate_json
+        
+        
+    
 class ModelManager:
     def __init__(self,
                  model_name, 
@@ -195,6 +265,10 @@ class ModelManager:
         self.feedback_cell_model = FeedbackCellModel(model_name=model_name, 
                                                openai_api_key=openai_api_key, 
                                                openai_api_base=openai_api_base)
+        
+        self.refiner_model = RefinerModel(model_name=model_name, 
+                                          openai_api_key=openai_api_key, 
+                                          openai_api_base=openai_api_base)
         self.source = source
         self.target=target
         if self.target is not None:
@@ -260,11 +334,20 @@ class ModelManager:
         for col in self.target_columns:
             if not self.transformed_source_first_row_json.get(col):
                 reformatted_row_json[col] = ""
+                
+        """reformatted_row_json = self.refiner_model(source_json=self.source.iloc[0].to_dict(),
+                                              target_json=self.target.iloc[-1].to_dict(),
+                                              intermediate_json = reformatted_row_json)"""
+                
         transformed_df = dict2row(reformatted_row_json)
         for k,cols in self.identical_columns.items():
             for col in cols:
                 if col not in transformed_df.columns:
                     transformed_df[col] = transformed_df[k]
+        print("transformed_df.columns")
+        print(transformed_df.columns)
+        print("self.original_columns:")
+        print(self.original_columns)
         self.transformed_df = transformed_df[self.original_columns]
         row = getRowDF(self.source,0)
         return {
@@ -309,7 +392,7 @@ class ModelManager:
         first_row = gt_row.iloc[0]
         json_str = first_row.to_json()
         target_json = json.loads(json_str)
-        target_json = {k:v for k,v in target_json.items() if k in self.target.columns}    
+        target_json = {k:[v] for k,v in target_json.items() if k in self.target.columns}    
 
         source_json = getRowDF(self.source,0).to_dict()
         
