@@ -93,6 +93,7 @@ if st.session_state.get("source") is not None and st.session_state.get("target")
         st.subheader("Original Row")
         st.dataframe(previous)
         st.subheader("✏️Transformed Row")
+        st.info("If any cells require edits, please click on them and make the necessary changes.")
         st.session_state.edited_row = st.data_editor(after)
         st.info("""Greetings from MapGPT. Based on the provided source and target tables, I've made adjustments to the initial row. Please take a moment to review the table. If you wish to make corrections, simply click on any cell to modify its contents. Once you're satisfied with the updates, kindly click the 'Submit' button to finalize your changes. If no corrections are required, you may proceed by pressing 'Submit' directly.""") 
 

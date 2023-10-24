@@ -166,8 +166,10 @@ JSON:{json_row}
 
 def getExamples(table, count=3, percentage=0.8):
     examples = ""
+    count = min(table.shape[0], count)
     columns = table.columns.to_list()
     for i in range(count):
+        print(i)
         example = getExample(table.iloc[i],columns, percentage)
         examples += example+"\n"
     return examples, columns
