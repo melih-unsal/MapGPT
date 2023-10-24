@@ -75,11 +75,11 @@ with main_process:
 with tables:
     if st.session_state.get("source") is not None:
         st.subheader("Source")
-        st.dataframe(st.session_state.source.head())
+        st.dataframe(st.session_state.source)
         
     if st.session_state.get("target") is not None:
         st.subheader("Target")
-        st.dataframe(st.session_state.target.head())      
+        st.dataframe(st.session_state.target)      
 
 if st.session_state.get("source") is not None and st.session_state.get("target") is not None and st.session_state.get("stage",-1) != -1:
     if st.session_state.get("stage") == 0:
@@ -100,18 +100,19 @@ if st.session_state.get("stage") == 1:
     finalize_table = st.button("Submit")
         
     if finalize_table:
-        progress_text = "Table is being reformatted..."
-        progress_bar = st.progress(0, text=progress_text)
-        data = None
-        for data, percentage in st.session_state.agent.getTable(st.session_state.edited_row):
-            progress_bar.progress(percentage, text=progress_text)
-        st.session_state.table = data 
-        st.session_state.stage = -1
-        st.rerun()
+        with st.spinner('Table is being finalized...'):
+            progress_text = "Final Table is being prepared..."
+            progress_bar = st.progress(0, text=progress_text)
+            data = None
+            for data, percentage in st.session_state.agent.getTable(st.session_state.edited_row):
+                progress_bar.progress(percentage, text=progress_text)
+            st.session_state.table = data 
+            st.session_state.stage = -1
+            st.rerun()
 
 if st.session_state.get("stage") == -1 and st.session_state.get("table") is not None:   
     st.subheader("Final Table") 
-    st.dataframe(st.session_state.table.head())
+    st.dataframe(st.session_state.table)
     st.download_button(
         label="Download Table",
         data=st.session_state.table.to_csv().encode('utf-8'),
