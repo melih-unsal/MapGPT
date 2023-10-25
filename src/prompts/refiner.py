@@ -4,6 +4,8 @@ In the Result JSON, some values might be hallucinated or could be inferred from 
 To make sure that you don't miss anything, investigate the Example JSON.
 Only use values from Elements. Use Example JSON only for style and formats
 The Refined JSON will have the same keys of Result JSON
+Refined JSON will be strictly as Python JSON.
+You cannot use null. Instead, you can use an empty string.
 """
 
 human_template = """

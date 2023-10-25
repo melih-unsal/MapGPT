@@ -7,7 +7,7 @@ from langchain.prompts.chat import (ChatPromptTemplate,
                                     HumanMessagePromptTemplate,
                                     SystemMessagePromptTemplate)
 from src.utils import (getExamples, getRow, dict2row, getRowDF, 
-                       getTableString, prepareDFForCell, 
+                       getTableString, prepareDFForCell, prepareDFForCellV2,
                        getMappingFromRowResult, getColumnGroups)
 from src import prompts
 import ast
@@ -41,7 +41,13 @@ class BaseModel:
     def __call__(self, is_json=True, **kwargs):
         res = self.chain.run(**kwargs)
         if is_json:
-            res = ast.literal_eval(res)
+            try:
+                res = json.loads(res)
+            except json.JSONDecodeError:
+                try:
+                    res = ast.literal_eval(res)
+                except (SyntaxError, ValueError):
+                    print("Failed to decode input string")
         return res
 
 class RowModel(BaseModel):
@@ -67,6 +73,20 @@ class RowModel(BaseModel):
                 new_row[col] = ""
 
         return new_row
+
+class ColumnTransformerModel(BaseModel):
+    """It gets a source row and couple of target rows then using few shot learning, it changes the keys of the source.
+    It results in an intermediate result for a single row where the values might not fit the target JSON but keys should. 
+    """
+    def __init__(self, model_name="gpt-3.5-turbo", 
+                 openai_api_key = os.getenv("OPENAI_API_KEY",""),
+                 openai_api_base=""):
+        super().__init__(model_name, 
+                         openai_api_key, 
+                         openai_api_base,
+                         system_template = prompts.column_transformation.system_template,
+                         human_template = prompts.column_transformation.human_template
+                         )
         
 class CellModel(BaseModel):
     """It gets intermediate row and couple of target rows for few shot learning.
@@ -83,6 +103,22 @@ class CellModel(BaseModel):
                          openai_api_base,
                          system_template = prompts.cell.system_template,
                          human_template = prompts.cell.human_template
+                         )
+        
+class CellModelV2(BaseModel):
+    """It gets intermediate row and couple of target rows for few shot learning.
+    Intermediate row and the target rows have the same columns.
+    Some of the intermediate rows might be empty which is also handled.
+    According to the target rows, assistant generates a valid rows without column names.
+    """
+    def __init__(self, model_name="gpt-3.5-turbo", 
+                 openai_api_key = os.getenv("OPENAI_API_KEY",""),
+                 openai_api_base=""):
+        super().__init__(model_name, 
+                         openai_api_key, 
+                         openai_api_base,
+                         system_template = prompts.cell_v2.system_template,
+                         human_template = prompts.cell_v2.human_template
                          )
     
 class ColumnMappingsModel(BaseModel):
@@ -263,11 +299,14 @@ class ModelManager:
                  openai_api_base,
                  source="",
                  target="",
-                 CELL_LIMIT=200):
+                 CELL_LIMIT=100):
         self.row_model = RowModel(model_name=model_name, 
                                   openai_api_key=openai_api_key, 
                                   openai_api_base=openai_api_base)
         self.cell_model = CellModel(model_name=model_name, 
+                                    openai_api_key=openai_api_key, 
+                                    openai_api_base=openai_api_base)
+        self.cell_model_v2 = CellModelV2(model_name=model_name, 
                                     openai_api_key=openai_api_key, 
                                     openai_api_base=openai_api_base)
         self.column_mappings_model = ColumnMappingsModel(model_name=model_name, 
@@ -288,14 +327,22 @@ class ModelManager:
         self.refiner_model = RefinerModel(model_name=model_name, 
                                           openai_api_key=openai_api_key, 
                                           openai_api_base=openai_api_base)
+        
+        self.column_transformer_model = ColumnTransformerModel(model_name=model_name, 
+                                                               openai_api_key=openai_api_key, 
+                                                               openai_api_base=openai_api_base)
+        
+        
         self.source = source
         self.target=target
+        self.target.fillna("",inplace=True)
         if self.target is not None:
             self.original_columns = self.target.columns
             self.target, self.identical_columns = getColumnGroups(self.target)
-        self.ROW_MODEL_FEW_SHOT_COUNT = 6 # it is the few shot example count for row model 
-        self.ROW_MODEL_PERCENTAGE = 0.6
-        self.CELL_MODEL_EXAMPLES_COUNT = 5
+                
+        self.ROW_MODEL_FEW_SHOT_COUNT = 3 # it is the few shot example count for row model 
+        self.ROW_MODEL_PERCENTAGE = 0.8
+        self.CELL_MODEL_EXAMPLES_COUNT = 5 # it was 5 before
         self.CELL_LIMIT = CELL_LIMIT
         self.stage = 0
         
@@ -314,6 +361,7 @@ class ModelManager:
     def setTables(self, source, target):
         self.source = source
         self.target = target
+        self.target.fillna("",inplace=True)
         
         if self.source is not None:
             self.SOURCE_ROW_PERIOD = max(1, self.CELL_LIMIT // self.source.shape[1])
@@ -341,9 +389,21 @@ class ModelManager:
         return self.mappings
     
     def getConfirmationMessage(self):
+        try:
+            """self.target_column_mapping = self.column_transformer_model(columns=list(self.target.columns),
+                                                                       row=self.target.iloc[0])
+            """
+            self.target_column_mapping = {}
+            
+        except Exception as e:
+            print("Target Column Mapping failed")
+            print(e)
+            self.target_column_mapping = {col:col for col in self.target.columns}
+            
         self.examples, self.target_columns = getExamples(self.target,
                                         self.ROW_MODEL_FEW_SHOT_COUNT,
-                                        self.ROW_MODEL_PERCENTAGE)
+                                        self.ROW_MODEL_PERCENTAGE,
+                                        self.target_column_mapping)
         
         self.source_first_row_str = getRow(self.source,0)
         self.transformed_source_first_row_json = self.row_model(examples=self.examples, columns=self.target_columns, row=self.source_first_row_str)
@@ -363,10 +423,51 @@ class ModelManager:
             for col in cols:
                 if col not in transformed_df.columns:
                     transformed_df[col] = transformed_df[k]
-        print("transformed_df.columns")
-        print(transformed_df.columns)
-        print("self.original_columns:")
-        print(self.original_columns)
+        self.transformed_df = transformed_df[self.original_columns]
+        row = getRowDF(self.source,0)
+        return {
+            "previous":row,
+            "after":self.transformed_df
+        }
+        
+    def getConfirmationMessageV2(self):
+        try:
+            self.target_column_mapping = self.column_transformer_model(columns=list(self.target.columns),
+                                                                       row=self.target.iloc[0])
+        except Exception as e:
+            print("Target Column Mapping failed")
+            print(e)
+            self.target_column_mapping = {col:col for col in self.target.columns}
+            
+        self.examples, self.target_columns = getExamples(self.target,
+                                        self.ROW_MODEL_FEW_SHOT_COUNT,
+                                        self.ROW_MODEL_PERCENTAGE,
+                                        self.target_column_mapping)
+        
+        self.source_first_row_str = getRow(self.source,0)
+        self.transformed_source_first_row_json = self.row_model(examples=self.examples, columns=self.target_columns, row=self.source_first_row_str)
+        table1 = {str(k):self.transformed_source_first_row_json.get(self.target.columns[k],'') for k in range(self.target.shape[1])}
+        reformatted_row_json_index_based = self.cell_model_v2(table1=table1,
+                                                  table2=prepareDFForCellV2(self.target,1,self.CELL_MODEL_EXAMPLES_COUNT),
+                                                  columns=[str(k) for k in range(self.target.shape[1])])
+        reformatted_row_json = {}
+        
+        for k in range(self.target.shape[1]):
+            res = reformatted_row_json_index_based.get(str(k),'')
+            col = self.target.columns[k]
+            if not self.transformed_source_first_row_json.get(col):
+                reformatted_row_json[col] = ""
+            else:
+                reformatted_row_json[col] = res     
+                
+        print("reformatted_row_json:")
+        print(reformatted_row_json)           
+                
+        transformed_df = dict2row(reformatted_row_json)
+        for k,cols in self.identical_columns.items():
+            for col in cols:
+                if col not in transformed_df.columns:
+                    transformed_df[col] = transformed_df[k]
         self.transformed_df = transformed_df[self.original_columns]
         row = getRowDF(self.source,0)
         return {

@@ -6,6 +6,7 @@ For each element of ARRAY1 will be a key of Element Mapping JSON
 For each value of Element Mapping JSON is a list of matching elements in ARRAY2 
 
 Mapping is strictly a Python JSON
+You cannot use null. Instead, you can use an empty string.
 """
 
 human_template = """

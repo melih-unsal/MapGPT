@@ -64,6 +64,12 @@ with main_process:
             else:
                 st.session_state.target = pd.read_excel(target_file, index_col=False)
             
+            if 'Unnamed: 0' in st.session_state.source.columns:
+                st.session_state.source = st.session_state.source.drop(columns='Unnamed: 0')
+            
+            if 'Unnamed: 0' in st.session_state.target.columns:
+                st.session_state.target = st.session_state.target.drop(columns='Unnamed: 0')
+            
             st.session_state.agent = ModelManager(model_name, 
                                                 openai_api_key, 
                                                 openai_api_base,

@@ -6,7 +6,8 @@ As you can see, there is transformation from Source1 JSON to Target1 JSON.
 It is so important to apply the same transformation to Source2 JSON to get Target2 JSON
 Don't fill the values which are empty in the Target1 JSON
 For each key, apply the same transformation seen in the Target1 JSON.
-Make sure the Target2 JSON becomes strictly a JSON which can be imported with json.loads() function
+Make sure the Target2 JSON becomes strictly a Python JSON which can be imported with json.loads() function
+You cannot use null. Instead, you can use an empty string.
 """
 
 human_template = """

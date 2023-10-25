@@ -5,6 +5,18 @@ import functools
 import operator
 
 
+def preprocessJson(json_str):
+    # Convert 'null' to empty string
+    json_str = json_str.replace('null', '')
+
+    # Convert 'false' to False and 'true' to True
+    json_str = json_str.replace('false', False)
+    json_str = json_str.replace('true', True)
+
+    # Convert 'nan' to empty string
+    json_str = json_str.replace('nan', '')
+    json_str = json_str.replace('NaN', '')
+
 def getColumnGroups(df):
     identical_columns = {}
     # Compare all pairs of columns
@@ -51,6 +63,30 @@ def prepareDFForCell(table, index=-1,count=None, another_table_json=None):
         json_str += json.dumps(row_dict) + "\n"
     
     return json_str.strip()  # Remove the trailing newline if present
+
+def prepareDFForCellV2(table, index=-1,count=None, another_table_json=None):
+    table = getTable(table, index, count)
+    # Check if the input is a pandas DataFrame
+    if not isinstance(table, pd.DataFrame):
+        raise ValueError("Input must be a pandas DataFrame")
+    
+    json_str = ""
+    
+    columns = list(table.columns)
+    
+    if another_table_json is not None:
+        another_table = dict2row(another_table_json)
+        no_empty_str_cols = another_table.columns[~another_table.apply(lambda col: col.astype(str).eq('').any())]
+        table = table[no_empty_str_cols]
+        
+    for row in table.itertuples(index=False):
+        # Convert the row to a dictionary
+        row_dict = row._asdict()
+        row_dict = {columns.index(k):v for k,v in row_dict.items()}
+        
+        json_str += json.dumps(row_dict) + "\n"
+    
+    return json_str.strip()
 
 def getTargetCols(mapping):
     return functools.reduce(operator.or_, (set(val) for val in mapping.values()))
@@ -107,7 +143,8 @@ def getTableString(df):
 def getTable(df, index=-1,count=None):
     if count is None:
         return df
-    return df.iloc[index:index+count,:]
+    row_count = df.shape[0]
+    return df.iloc[index:min(row_count,index+count),:]
 
 def dict2row(dict):
     new_dict = {}
@@ -127,7 +164,10 @@ def getRowDF(table, index):
     
 def getRow(table, index):
     row = table.iloc[index].to_list()
-    return ' '.join([str(item) for item in row])
+    columns = table.columns
+    
+    elements = [f"{col} is {cell}" for col,cell in zip(columns,row)]    
+    return ", ".join(elements)
 
 def getRandomIndices(n, percentage=0.8):
     indices = list(range(n))
@@ -135,7 +175,7 @@ def getRandomIndices(n, percentage=0.8):
     taken_indices = random.sample(indices,count)
     return taken_indices
 
-def getExample(row, columns, percentage=0.8):
+def getExample(row, columns, percentage=0.8, column_mapping={}):
     indices = getRandomIndices(len(columns), percentage)
     row = row.tolist()
     new_row = [str(row[i]) for i in indices]
@@ -146,8 +186,10 @@ def getExample(row, columns, percentage=0.8):
         new_row.append("")
         new_columns.append(col)"""
     json_row = {column:item for item,column in zip(new_row, new_columns)}
+    elements = [f"{column_mapping.get(col,col)} is {cell}" for col,cell in json_row.items()]
+    elements = ", ".join(elements)
     return f"""
-Elements:  {' '.join(new_row)}
+Elements:  {elements}
 JSON:{json_row}
     """
     
@@ -164,13 +206,13 @@ Elements:  {' '.join(row)}
 JSON:{json_row}
     """
 
-def getExamples(table, count=3, percentage=0.8):
+def getExamples(table, count=3, percentage=0.8,column_mapping={}):
     examples = ""
     count = min(table.shape[0], count)
     columns = table.columns.to_list()
     for i in range(count):
         print(i)
-        example = getExample(table.iloc[i],columns, percentage)
+        example = getExample(table.iloc[i],columns, percentage,column_mapping)
         examples += example+"\n"
     return examples, columns
 
