@@ -3,7 +3,7 @@ import random
 import json
 import functools
 import operator
-
+from src import args
 
 def preprocessJson(json_str):
     # Convert 'null' to empty string
@@ -43,7 +43,13 @@ def getColumnGroups(df):
     all_columns = list(all_columns)
     return df.loc[:,all_columns], identical_columns 
 
-def prepareDFForCell(table, index=-1,count=None, another_table_json=None):
+def prepareDFForCell(table, index=-1, another_table_json=None):
+    
+    if table.shape[1] > args.HIGH_TARGET_COLUMN_MAPPING:
+        count = args.CELL_MODEL_EXAMPLES_COUNT_BIG
+    else:
+        count = args.CELL_MODEL_EXAMPLES_COUNT_SMALL
+    
     table = getTable(table, index, count)
     # Check if the input is a pandas DataFrame
     if not isinstance(table, pd.DataFrame):
@@ -175,19 +181,26 @@ def getRandomIndices(n, percentage=0.8):
     taken_indices = random.sample(indices,count)
     return taken_indices
 
-def getExample(row, columns, percentage=0.8, column_mapping={}):
+def getExampleBig(row, columns, percentage=0.8, column_mapping={}):
     indices = getRandomIndices(len(columns), percentage)
     row = row.tolist()
     new_row = [str(row[i]) for i in indices]
     new_columns = [columns[i] for i in indices]
-    """remaining_indices = set(range(len(columns))) - set(indices)
-    for index in remaining_indices:
-        col = columns[index]
-        new_row.append("")
-        new_columns.append(col)"""
     json_row = {column:item for item,column in zip(new_row, new_columns)}
     elements = [f"{column_mapping.get(col,col)} is {cell}" for col,cell in json_row.items()]
     elements = ", ".join(elements)
+    return f"""
+Elements:  {elements}
+JSON:{json_row}
+    """
+    
+def getExampleSmall(row, columns, percentage=0.8):
+    indices = getRandomIndices(len(columns), percentage)
+    row = row.tolist()
+    new_row = [str(row[i]) for i in indices]
+    new_columns = [columns[i] for i in indices]
+    json_row = {column:item for item,column in zip(new_row, new_columns)}
+    elements = ' '.join(new_row) 
     return f"""
 Elements:  {elements}
 JSON:{json_row}
@@ -206,13 +219,22 @@ Elements:  {' '.join(row)}
 JSON:{json_row}
     """
 
-def getExamples(table, count=3, percentage=0.8,column_mapping={}):
+def getExamples(table ,column_mapping={}):
+    if table.shape[1] > args.TARGET_COLUMN_THRESHOLD:
+        count = 3   # sets the number of few shot prompts
+        percentage = 0.8     # sets the remaining columns percentage after randomly removing them.
+        example_func = getExampleSmall
+    else:
+        count = 6   # sets the number of few shot prompts
+        percentage = 0.6     # sets the remaining columns percentage after randomly removing them.
+        example_func = getExampleBig
+    
     examples = ""
     count = min(table.shape[0], count)
     columns = table.columns.to_list()
     for i in range(count):
         print(i)
-        example = getExample(table.iloc[i],columns, percentage,column_mapping)
+        example = example_func(table.iloc[i],columns, percentage,column_mapping)
         examples += example+"\n"
     return examples, columns
 

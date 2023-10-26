@@ -297,21 +297,25 @@ class ModelManager:
                  model_name, 
                  openai_api_key, 
                  openai_api_base,
-                 source="",
-                 target="",
+                 source=None,
+                 target=None,
                  CELL_LIMIT=100):
         self.row_model = RowModel(model_name=model_name, 
                                   openai_api_key=openai_api_key, 
                                   openai_api_base=openai_api_base)
+        
         self.cell_model = CellModel(model_name=model_name, 
                                     openai_api_key=openai_api_key, 
                                     openai_api_base=openai_api_base)
+        
         self.cell_model_v2 = CellModelV2(model_name=model_name, 
                                     openai_api_key=openai_api_key, 
                                     openai_api_base=openai_api_base)
+        
         self.column_mappings_model = ColumnMappingsModel(model_name=model_name, 
                                               openai_api_key=openai_api_key, 
                                               openai_api_base=openai_api_base)
+        
         self.applier_model = ApplierModel(model_name=model_name, 
                                           openai_api_key=openai_api_key, 
                                           openai_api_base=openai_api_base)
@@ -332,18 +336,28 @@ class ModelManager:
                                                                openai_api_key=openai_api_key, 
                                                                openai_api_base=openai_api_base)
         
-        
+        self.target_column_threshold = 20       # it is used to decide for the algorithm used in few shot prompt preparation.
+        self.high_target_column_mapping = 30    # it is used to decide for the example count for CellModel
         self.source = source
         self.target=target
-        self.target.fillna("",inplace=True)
         if self.target is not None:
             self.original_columns = self.target.columns
             self.target, self.identical_columns = getColumnGroups(self.target)
+            self.target.fillna("",inplace=True)
+            if self.target.shape[1] > self.target_column_threshold:
+                self.ROW_MODEL_FEW_SHOT_COUNT = 3   # sets the number of few shot prompts
+                self.ROW_MODEL_PERCENTAGE = 0.8     # sets the remaining columns percentage after randomly removing them.
+            else:
+                self.ROW_MODEL_FEW_SHOT_COUNT = 6   # sets the number of few shot prompts
+                self.ROW_MODEL_PERCENTAGE = 0.6     # sets the remaining columns percentage after randomly removing them.
+            
+            if self.target.shape[1] > self.high_target_column_mapping:
+                self.CELL_MODEL_EXAMPLES_COUNT = 3  # it is used for example generation for finalizing the first row
+            else:
+                self.CELL_MODEL_EXAMPLES_COUNT = 5  # it is used for example generation for finalizing the first row
                 
-        self.ROW_MODEL_FEW_SHOT_COUNT = 3 # it is the few shot example count for row model 
-        self.ROW_MODEL_PERCENTAGE = 0.8
-        self.CELL_MODEL_EXAMPLES_COUNT = 5 # it was 5 before
-        self.CELL_LIMIT = CELL_LIMIT
+            self.CELL_LIMIT = CELL_LIMIT            # it is used for number of cell generation during the completion of the whole table
+            
         self.stage = 0
         
         if self.source is not None:
@@ -381,34 +395,20 @@ class ModelManager:
         self.transformed_source_first_row_json = self.row_model(examples=self.examples, columns=self.target_columns, row=self.source_first_row_str)
         transformed_source_first_row_df = dict2row(self.transformed_source_first_row_json)
         row = getRowDF(self.source,0)
-        source_fst_row_str_in_table = getTableString(row)
-        transformed_source_fst_row_str_in_table = getTableString(transformed_source_first_row_df)
+        # source_fst_row_str_in_table = getTableString(row)
+        # transformed_source_fst_row_str_in_table = getTableString(transformed_source_first_row_df)
         self.stage = 1
         self.mappings = self.column_mappings_model(array1=row, 
-                                    array2=transformed_source_first_row_df)
+                                                   array2=transformed_source_first_row_df)
         return self.mappings
     
-    def getConfirmationMessage(self):
-        try:
-            """self.target_column_mapping = self.column_transformer_model(columns=list(self.target.columns),
-                                                                       row=self.target.iloc[0])
-            """
-            self.target_column_mapping = {}
-            
-        except Exception as e:
-            print("Target Column Mapping failed")
-            print(e)
-            self.target_column_mapping = {col:col for col in self.target.columns}
-            
-        self.examples, self.target_columns = getExamples(self.target,
-                                        self.ROW_MODEL_FEW_SHOT_COUNT,
-                                        self.ROW_MODEL_PERCENTAGE,
-                                        self.target_column_mapping)
+    def getConfirmationMessage(self):           
+        self.examples, self.target_columns = getExamples(self.target)
         
         self.source_first_row_str = getRow(self.source,0)
         self.transformed_source_first_row_json = self.row_model(examples=self.examples, columns=self.target_columns, row=self.source_first_row_str)
         reformatted_row_json = self.cell_model(table1=self.transformed_source_first_row_json,
-                                               table2=prepareDFForCell(self.target,0,self.CELL_MODEL_EXAMPLES_COUNT),
+                                               table2=prepareDFForCell(self.target,0),
                                                columns=self.target_columns)
         for col in self.target_columns:
             if not self.transformed_source_first_row_json.get(col):
@@ -460,7 +460,6 @@ class ModelManager:
             else:
                 reformatted_row_json[col] = res     
                 
-        print("reformatted_row_json:")
         print(reformatted_row_json)           
                 
         transformed_df = dict2row(reformatted_row_json)
@@ -483,8 +482,8 @@ class ModelManager:
                                                                      feedback=feedback)
         transformed_source_first_row_df = dict2row(self.transformed_source_first_row_json)
         row = getRowDF(self.source,0)
-        source_fst_row_str_in_table = getTableString(row)
-        transformed_source_fst_row_str_in_table = getTableString(transformed_source_first_row_df)
+        # source_fst_row_str_in_table = getTableString(row)
+        # transformed_source_fst_row_str_in_table = getTableString(transformed_source_first_row_df)
         self.stage = 1
         self.mappings = self.column_mappings_model(array1=row, 
                                            array2=transformed_source_first_row_df)
@@ -498,8 +497,8 @@ class ModelManager:
                                                                      feedback=feedback)
         transformed_source_first_row_df = dict2row(self.transformed_source_first_row_json)
         row = getRowDF(self.source,0)
-        source_fst_row_str_in_table = getTableString(row)
-        transformed_source_fst_row_str_in_table = getTableString(transformed_source_first_row_df)
+        # source_fst_row_str_in_table = getTableString(row)
+        # transformed_source_fst_row_str_in_table = getTableString(transformed_source_first_row_df)
         self.stage = 1
         self.mappings = self.column_mappings_model(array1=row, 
                                                    array2=transformed_source_first_row_df)
