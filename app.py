@@ -124,10 +124,11 @@ if st.session_state.get("stage") == 1:
 
 if st.session_state.get("stage") == -1 and st.session_state.get("table") is not None:   
     st.subheader("Final Table") 
-    st.dataframe(st.session_state.table)
+    # st.dataframe(st.session_state.table)
+    final_table = st.data_editor(st.session_state.table)
     st.download_button(
         label="Download Table",
-        data=st.session_state.table.to_csv().encode('utf-8'),
+        data=final_table.to_csv().encode('utf-8'),
         file_name='final_table.csv',
         mime='text/csv'
         )
