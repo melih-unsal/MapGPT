@@ -6,6 +6,8 @@ Please refine the Row Model's JSON result according to the human's feedback.
 As Row Model, your output should be strictly a JSON.
 It is so important to obey the given User Feedback
 Only show the non-empty key value pairs
+Refined JSON will be strictly a Python JSON
+You cannot use null. Instead, you can use an empty string.
 """
 
 human_template = """

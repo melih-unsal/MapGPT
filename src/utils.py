@@ -3,7 +3,21 @@ import random
 import json
 import functools
 import operator
+from src import args
 
+def preprocessJson(json_str):
+    # Convert 'null' to empty string
+    json_str = json_str.replace('null', '')
+
+    # Convert 'false' to False and 'true' to True
+    json_str = json_str.replace('false', False)
+    json_str = json_str.replace('true', True)
+
+    # Convert 'nan' to empty string
+    json_str = json_str.replace('nan', '')
+    json_str = json_str.replace('NaN', '')
+    
+    return json_str
 
 def getColumnGroups(df):
     identical_columns = {}
@@ -31,7 +45,13 @@ def getColumnGroups(df):
     all_columns = list(all_columns)
     return df.loc[:,all_columns], identical_columns 
 
-def prepareDFForCell(table, index=-1,count=None, another_table_json=None):
+def prepareDFForCell(table, index=-1, another_table_json=None):
+    
+    if table.shape[1] > args.HIGH_TARGET_COLUMN_MAPPING:
+        count = args.CELL_MODEL_EXAMPLES_COUNT_BIG
+    else:
+        count = args.CELL_MODEL_EXAMPLES_COUNT_SMALL
+    
     table = getTable(table, index, count)
     # Check if the input is a pandas DataFrame
     if not isinstance(table, pd.DataFrame):
@@ -47,10 +67,33 @@ def prepareDFForCell(table, index=-1,count=None, another_table_json=None):
     for row in table.itertuples(index=False):
         # Convert the row to a dictionary
         row_dict = row._asdict()
-        
         json_str += json.dumps(row_dict) + "\n"
     
     return json_str.strip()  # Remove the trailing newline if present
+
+def prepareDFForCellV2(table, index=-1,count=None, another_table_json=None):
+    table = getTable(table, index, count)
+    # Check if the input is a pandas DataFrame
+    if not isinstance(table, pd.DataFrame):
+        raise ValueError("Input must be a pandas DataFrame")
+    
+    json_str = ""
+    
+    columns = list(table.columns)
+    
+    if another_table_json is not None:
+        another_table = dict2row(another_table_json)
+        no_empty_str_cols = another_table.columns[~another_table.apply(lambda col: col.astype(str).eq('').any())]
+        table = table[no_empty_str_cols]
+        
+    for row in table.itertuples(index=False):
+        # Convert the row to a dictionary
+        row_dict = row._asdict()
+        row_dict = {columns.index(k):v for k,v in row_dict.items()}
+        
+        json_str += json.dumps(row_dict) + "\n"
+    
+    return json_str.strip()
 
 def getTargetCols(mapping):
     return functools.reduce(operator.or_, (set(val) for val in mapping.values()))
@@ -107,7 +150,8 @@ def getTableString(df):
 def getTable(df, index=-1,count=None):
     if count is None:
         return df
-    return df.iloc[index:index+count,:]
+    row_count = df.shape[0]
+    return df.iloc[index:min(row_count,index+count),:]
 
 def dict2row(dict):
     new_dict = {}
@@ -127,7 +171,10 @@ def getRowDF(table, index):
     
 def getRow(table, index):
     row = table.iloc[index].to_list()
-    return ' '.join([str(item) for item in row])
+    columns = table.columns
+    
+    elements = [f"{col} is {cell}" for col,cell in zip(columns,row)]    
+    return ", ".join(elements)
 
 def getRandomIndices(n, percentage=0.8):
     indices = list(range(n))
@@ -135,42 +182,54 @@ def getRandomIndices(n, percentage=0.8):
     taken_indices = random.sample(indices,count)
     return taken_indices
 
-def getExample(row, columns, percentage=0.8):
+def getExampleBig(row, columns, percentage=0.8):
     indices = getRandomIndices(len(columns), percentage)
     row = row.tolist()
     new_row = [str(row[i]) for i in indices]
     new_columns = [columns[i] for i in indices]
-    """remaining_indices = set(range(len(columns))) - set(indices)
-    for index in remaining_indices:
-        col = columns[index]
-        new_row.append("")
-        new_columns.append(col)"""
     json_row = {column:item for item,column in zip(new_row, new_columns)}
+    elements = [f"{col} is {cell}" for col,cell in json_row.items()]
+    elements = ", ".join(elements)
     return f"""
-Elements:  {' '.join(new_row)}
+Elements:  {elements}
 JSON:{json_row}
     """
     
-def getExample_v2(row, columns, percentage=0.8):
+def getExampleSmall(row, columns, percentage=0.8):
+    indices = getRandomIndices(len(columns), percentage)
+    row = row.tolist()
+    new_row = [str(row[i]) for i in indices]
+    new_columns = [columns[i] for i in indices]
+    json_row = {column:item for item,column in zip(new_row, new_columns)}
+    elements = ' '.join(new_row) 
+    return f"""
+Elements:  {elements}
+JSON:{json_row}
+    """
+    
+def getExample_v2(row, columns):
     row = [str(item) for item in row.tolist()]
-    """remaining_indices = set(range(len(columns))) - set(indices)
-    for index in remaining_indices:
-        col = columns[index]
-        new_row.append("")
-        new_columns.append(col)"""
     json_row = {column:item for item,column in zip(row, columns)}
     return f"""
 Elements:  {' '.join(row)}
 JSON:{json_row}
     """
 
-def getExamples(table, count=3, percentage=0.8):
+def getExamples(table):
+    if table.shape[1] < args.TARGET_COLUMN_THRESHOLD:
+        count = args.ROW_MODEL_FEW_SHOT_COUNT_SMALL   # sets the number of few shot prompts
+        percentage = args.ROW_MODEL_PERCENTAGE_SMALL     # sets the remaining columns percentage after randomly removing them.
+        example_func = getExampleSmall
+    else:
+        count = args.ROW_MODEL_FEW_SHOT_COUNT_BIG   # sets the number of few shot prompts
+        percentage = args.ROW_MODEL_PERCENTAGE_BIG     # sets the remaining columns percentage after randomly removing them.
+        example_func = getExampleBig
+    
     examples = ""
     count = min(table.shape[0], count)
     columns = table.columns.to_list()
     for i in range(count):
-        print(i)
-        example = getExample(table.iloc[i],columns, percentage)
+        example = example_func(table.iloc[i],columns, percentage)
         examples += example+"\n"
     return examples, columns
 
