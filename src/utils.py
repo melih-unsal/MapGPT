@@ -206,13 +206,8 @@ Elements:  {elements}
 JSON:{json_row}
     """
     
-def getExample_v2(row, columns, percentage=0.8):
+def getExample_v2(row, columns):
     row = [str(item) for item in row.tolist()]
-    """remaining_indices = set(range(len(columns))) - set(indices)
-    for index in remaining_indices:
-        col = columns[index]
-        new_row.append("")
-        new_columns.append(col)"""
     json_row = {column:item for item,column in zip(row, columns)}
     return f"""
 Elements:  {' '.join(row)}
