@@ -16,6 +16,8 @@ def preprocessJson(json_str):
     # Convert 'nan' to empty string
     json_str = json_str.replace('nan', '')
     json_str = json_str.replace('NaN', '')
+    
+    return json_str
 
 def getColumnGroups(df):
     identical_columns = {}
@@ -65,7 +67,6 @@ def prepareDFForCell(table, index=-1, another_table_json=None):
     for row in table.itertuples(index=False):
         # Convert the row to a dictionary
         row_dict = row._asdict()
-        
         json_str += json.dumps(row_dict) + "\n"
     
     return json_str.strip()  # Remove the trailing newline if present
@@ -181,13 +182,13 @@ def getRandomIndices(n, percentage=0.8):
     taken_indices = random.sample(indices,count)
     return taken_indices
 
-def getExampleBig(row, columns, percentage=0.8, column_mapping={}):
+def getExampleBig(row, columns, percentage=0.8):
     indices = getRandomIndices(len(columns), percentage)
     row = row.tolist()
     new_row = [str(row[i]) for i in indices]
     new_columns = [columns[i] for i in indices]
     json_row = {column:item for item,column in zip(new_row, new_columns)}
-    elements = [f"{column_mapping.get(col,col)} is {cell}" for col,cell in json_row.items()]
+    elements = [f"{col} is {cell}" for col,cell in json_row.items()]
     elements = ", ".join(elements)
     return f"""
 Elements:  {elements}
@@ -214,22 +215,21 @@ Elements:  {' '.join(row)}
 JSON:{json_row}
     """
 
-def getExamples(table ,column_mapping={}):
-    if table.shape[1] > args.TARGET_COLUMN_THRESHOLD:
-        count = 3   # sets the number of few shot prompts
-        percentage = 0.8     # sets the remaining columns percentage after randomly removing them.
+def getExamples(table):
+    if table.shape[1] < args.TARGET_COLUMN_THRESHOLD:
+        count = args.ROW_MODEL_FEW_SHOT_COUNT_SMALL   # sets the number of few shot prompts
+        percentage = args.ROW_MODEL_PERCENTAGE_SMALL     # sets the remaining columns percentage after randomly removing them.
         example_func = getExampleSmall
     else:
-        count = 6   # sets the number of few shot prompts
-        percentage = 0.6     # sets the remaining columns percentage after randomly removing them.
+        count = args.ROW_MODEL_FEW_SHOT_COUNT_BIG   # sets the number of few shot prompts
+        percentage = args.ROW_MODEL_PERCENTAGE_BIG     # sets the remaining columns percentage after randomly removing them.
         example_func = getExampleBig
     
     examples = ""
     count = min(table.shape[0], count)
     columns = table.columns.to_list()
     for i in range(count):
-        print(i)
-        example = example_func(table.iloc[i],columns, percentage,column_mapping)
+        example = example_func(table.iloc[i],columns, percentage)
         examples += example+"\n"
     return examples, columns
 

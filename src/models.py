@@ -19,6 +19,7 @@ class BaseModel:
                  openai_api_base="",
                  system_template="", 
                  human_template="",
+                 name="Base Model"
                  ):
         self.llm = ChatOpenAI(
             model=model_name,
@@ -26,6 +27,7 @@ class BaseModel:
             temperature=0,
             openai_api_base=openai_api_base
         )
+        self.name=name
         self.initChain(system_template, human_template)
         
     def initChain(self, system_template="", human_template=""):
@@ -36,7 +38,7 @@ class BaseModel:
             prompts.append(HumanMessagePromptTemplate.from_template(human_template))
         chat_prompt = ChatPromptTemplate.from_messages(prompts)
         self.chain =  LLMChain(llm=self.llm, prompt=chat_prompt)
-        print("LLMChain has been successfully initialized.")
+        print(f"{self.name} has been successfully initialized.")
         
     def __call__(self, is_json=True, **kwargs):
         res = self.chain.run(**kwargs)
@@ -61,16 +63,20 @@ class RowModel(BaseModel):
                          openai_api_key, 
                          openai_api_base,
                          system_template = prompts.row.system_template,
-                         human_template = prompts.row.human_template
+                         human_template = prompts.row.human_template,
+                         name="Row Model"
                          )
         
     def __call__(self, **kwargs):
-        new_row = super().__call__(**kwargs)
-        new_row = {k:v for k, v in new_row.items() if v}
+        res = super().__call__(**kwargs)
+        res = {k:v for k, v in res.items() if v}
         target_columns = kwargs.get('columns')
+        new_row = {}
         for col in target_columns:
-            if col not in new_row:
+            if col not in res:
                 new_row[col] = ""
+            else:
+                new_row[col] = res[col]
 
         return new_row
 
@@ -85,7 +91,8 @@ class ColumnTransformerModel(BaseModel):
                          openai_api_key, 
                          openai_api_base,
                          system_template = prompts.column_transformation.system_template,
-                         human_template = prompts.column_transformation.human_template
+                         human_template = prompts.column_transformation.human_template,
+                         name="Column Transformer Model"
                          )
         
 class CellModel(BaseModel):
@@ -102,7 +109,8 @@ class CellModel(BaseModel):
                          openai_api_key, 
                          openai_api_base,
                          system_template = prompts.cell.system_template,
-                         human_template = prompts.cell.human_template
+                         human_template = prompts.cell.human_template,
+                         name="Cell Model"
                          )
         
 class CellModelV2(BaseModel):
@@ -118,7 +126,8 @@ class CellModelV2(BaseModel):
                          openai_api_key, 
                          openai_api_base,
                          system_template = prompts.cell_v2.system_template,
-                         human_template = prompts.cell_v2.human_template
+                         human_template = prompts.cell_v2.human_template,
+                         name="Cell Model V2"
                          )
     
 class ColumnMappingsModel(BaseModel):
@@ -132,7 +141,8 @@ class ColumnMappingsModel(BaseModel):
                          openai_api_key, 
                          openai_api_base,
                          system_template = prompts.column_mappings.system_template,
-                         human_template = prompts.column_mappings.human_template
+                         human_template = prompts.column_mappings.human_template,
+                         name="Column Mapping Model"
                          )
         
     def __call__(self, **kwargs):
@@ -155,7 +165,8 @@ class ApplierModel(BaseModel):
                          openai_api_key, 
                          openai_api_base,
                          system_template = prompts.applier.system_template,
-                         human_template = prompts.applier.human_template
+                         human_template = prompts.applier.human_template,
+                         name="Applier Model"
                          )
         
     def refine(self, res):
@@ -191,7 +202,8 @@ class FeedbackRowModel(BaseModel):
                          openai_api_key, 
                          openai_api_base,
                          system_template = prompts.feedback_row.system_template,
-                         human_template = prompts.feedback_row.human_template
+                         human_template = prompts.feedback_row.human_template,
+                         name="Feedback Row Model"
                          )
         
     def __call__(self,**kwargs):
@@ -209,7 +221,8 @@ class FeedbackCellModel(BaseModel):
                          openai_api_key, 
                          openai_api_base,
                          system_template = prompts.feedback_cell.system_template,
-                         human_template = prompts.feedback_cell.human_template
+                         human_template = prompts.feedback_cell.human_template,
+                         name="Feedback Cell Model"
                          )
         
     def __call__(self, **kwargs):
@@ -232,7 +245,8 @@ class Json2ParagraphModel(BaseModel):
                          openai_api_key, 
                          openai_api_base,
                          system_template = prompts.json2paragraph.system_template,
-                         human_template = prompts.json2paragraph.human_template
+                         human_template = prompts.json2paragraph.human_template,
+                         name="JSON To Paragraph Model"
                          )
         
     def __call__(self, **kwargs):
@@ -248,7 +262,8 @@ class Paragraph2JsonModel(BaseModel):
                          openai_api_key, 
                          openai_api_base,
                          system_template = prompts.paragraph2json.system_template,
-                         human_template = prompts.paragraph2json.human_template
+                         human_template = prompts.paragraph2json.human_template,
+                         name="Paragraph To JSON Model"
                          )
     
 class RefinerModel(BaseModel):
@@ -261,7 +276,8 @@ class RefinerModel(BaseModel):
                          openai_api_key, 
                          openai_api_base,
                          system_template = prompts.refiner.system_template,
-                         human_template = prompts.refiner.human_template
+                         human_template = prompts.refiner.human_template,
+                         name="Refiner Model"
                          )
         self.paragraph2json_model = Paragraph2JsonModel(model_name, 
                                                         openai_api_key, 
@@ -299,7 +315,7 @@ class ModelManager:
                  openai_api_base,
                  source=None,
                  target=None,
-                 CELL_LIMIT=100):
+                 CELL_LIMIT=50):
         self.row_model = RowModel(model_name=model_name, 
                                   openai_api_key=openai_api_key, 
                                   openai_api_base=openai_api_base)
@@ -344,19 +360,13 @@ class ModelManager:
             self.original_columns = self.target.columns
             self.target, self.identical_columns = getColumnGroups(self.target)
             self.target.fillna("",inplace=True)
-            if self.target.shape[1] > self.target_column_threshold:
-                self.ROW_MODEL_FEW_SHOT_COUNT = 3   # sets the number of few shot prompts
-                self.ROW_MODEL_PERCENTAGE = 0.8     # sets the remaining columns percentage after randomly removing them.
-            else:
-                self.ROW_MODEL_FEW_SHOT_COUNT = 6   # sets the number of few shot prompts
-                self.ROW_MODEL_PERCENTAGE = 0.6     # sets the remaining columns percentage after randomly removing them.
-            
-            if self.target.shape[1] > self.high_target_column_mapping:
-                self.CELL_MODEL_EXAMPLES_COUNT = 3  # it is used for example generation for finalizing the first row
-            else:
-                self.CELL_MODEL_EXAMPLES_COUNT = 5  # it is used for example generation for finalizing the first row
-                
-            self.CELL_LIMIT = CELL_LIMIT            # it is used for number of cell generation during the completion of the whole table
+            # Convert all Timestamp columns to string
+            for col in self.target.select_dtypes(include=["datetime"]).columns:
+                self.target[col] = self.target[col].astype(str)
+            for col in self.source.select_dtypes(include=["datetime"]).columns:
+                self.source[col] = self.source[col].astype(str)
+        
+        self.CELL_LIMIT = CELL_LIMIT            # it is used for number of cell generation during the completion of the whole table
             
         self.stage = 0
         
@@ -376,6 +386,12 @@ class ModelManager:
         self.source = source
         self.target = target
         self.target.fillna("",inplace=True)
+        
+        # Convert all Timestamp columns to string
+        for col in self.target.select_dtypes(include=["datetime"]).columns:
+            self.target[col] = self.target[col].astype(str)
+        for col in self.source.select_dtypes(include=["datetime"]).columns:
+            self.source[col] = self.source[col].astype(str)
         
         if self.source is not None:
             self.SOURCE_ROW_PERIOD = max(1, self.CELL_LIMIT // self.source.shape[1])
@@ -439,10 +455,7 @@ class ModelManager:
             print(e)
             self.target_column_mapping = {col:col for col in self.target.columns}
             
-        self.examples, self.target_columns = getExamples(self.target,
-                                        self.ROW_MODEL_FEW_SHOT_COUNT,
-                                        self.ROW_MODEL_PERCENTAGE,
-                                        self.target_column_mapping)
+        self.examples, self.target_columns = getExamples(self.target)
         
         self.source_first_row_str = getRow(self.source,0)
         self.transformed_source_first_row_json = self.row_model(examples=self.examples, columns=self.target_columns, row=self.source_first_row_str)
