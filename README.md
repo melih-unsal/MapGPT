@@ -77,6 +77,7 @@ During the development of MapGPT, various models and approaches were experimente
 - [x] Editable intermediate result (**Streamlit**)
 - [x] Editable Final Result (**Streamlit**)
 - [x] Download button (**Streamlit**)
+- [x] LangSmith integration (**LangChain**)
 - [x] random column shuffle (to get rid of hallucination) (**RowModel**)
 - [x] random column removal (to get rid of hallucination) (**RowModel**)
 - [x] Different decoder usage for small and big tables (according to the column size) (**RowModel**)
