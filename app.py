@@ -121,7 +121,7 @@ if st.session_state.get("source") is not None and st.session_state.get("target")
             progress_bar.progress(percentage, text=progress_text)
         st.session_state.table = data 
         st.session_state.stage = -1
-        st.rerun()
+        #st.rerun()
 
 if st.session_state.get("stage") == 1 and model_name != "finetuned_model":
     finalize_table = st.button("Submit")
