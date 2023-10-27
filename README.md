@@ -30,6 +30,12 @@ After the generation process, user can then preview the final table before downl
 
 Experience the live demo of MapGPT on our Streamlit app: [MapGPT Streamlit App](https://mapgpt.streamlit.app/)
 
+
+
+https://github.com/melih-unsal/MapGPT/assets/34304254/65115924-abd7-445a-a88c-e140ff70c7cd
+
+
+
 ## 🌟 Features
 
 - Intelligent mapping of table data
