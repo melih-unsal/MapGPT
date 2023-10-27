@@ -4,7 +4,7 @@ MapGPT is an innovative open-source tool designed to reformat your source table 
 
 ## ⚙️ Architecture
 ### MapGPT Architecture
-![MapGPT Pipeline](mapgpt_pipeline.png)
+![MapGPT Pipeline](assets/mapgpt_pipeline.png)
 
 
 ## 🛠️ How It Works
@@ -29,6 +29,13 @@ After the generation process, user can then preview the final table before downl
 ## 🚀 Live Demo
 
 Experience the live demo of MapGPT on our Streamlit app: [MapGPT Streamlit App](https://mapgpt.streamlit.app/)
+
+![img1](assets/img1.png)
+![img2](assets/img2.png)
+![img3](assets/img3.png)
+![img4](assets/img4.png)
+![img5](assets/img5.png)
+![img6](assets/img6.png)
 
 ## 🌟 Features
 
