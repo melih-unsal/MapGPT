@@ -4,7 +4,7 @@ import streamlit as st
 from time import sleep
 from src.models import ModelManager
 
-title = "MapGPT"
+title = "🔄 MapGPT"
 
 st.set_page_config(page_title=title, layout="wide")
     
