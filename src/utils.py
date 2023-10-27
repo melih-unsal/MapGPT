@@ -169,11 +169,13 @@ def getColumns(df):
 def getRowDF(table, index):
     return table.iloc[index:index+1]
     
-def getRow(table, index):
+def getRow(table, index, target_col_size):
     row = table.iloc[index].to_list()
     columns = table.columns
-    
-    elements = [f"{col} is {cell}" for col,cell in zip(columns,row)]    
+    if target_col_size < args.TARGET_COLUMN_THRESHOLD:
+        elements = [str(item) for item in row]
+    else:
+        elements = [f"{col} is {cell}" for col,cell in zip(columns,row)]    
     return ", ".join(elements)
 
 def getRandomIndices(n, percentage=0.8):

@@ -440,7 +440,7 @@ class ModelManager:
     def getConfirmationMessage(self):           
         self.examples, self.target_columns = getExamples(self.target)
         
-        self.source_first_row_str = getRow(self.source,0)
+        self.source_first_row_str = getRow(self.source,0,self.target.shape[0])
         self.transformed_source_first_row_json = self.row_model(examples=self.examples, columns=self.target_columns, row=self.source_first_row_str)
         reformatted_row_json = self.cell_model(table1=self.transformed_source_first_row_json,
                                                table2=prepareDFForCell(self.target,0),
