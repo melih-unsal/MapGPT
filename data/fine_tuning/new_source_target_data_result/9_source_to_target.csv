@@ -1,0 +1,11 @@
+,BeneficiaryID,PolicyNumber,BeneficiaryName,Relationship,BenefitPercentage,ContactNumber
+0,5001,POL011,John Doe,Spouse,50,+1234567890
+1,5002,POL012,Jane Smith,Child,25,+1234567891
+2,5003,POL013,Alice Johnson,Parent,25,+1234567892
+3,5004,POL014,Bob White,Spouse,50,+1234567893
+4,5005,POL015,Charlie Brown,Child,25,+1234567894
+5,5006,POL016,David Green,Parent,25,+1234567895
+6,5007,POL017,Eva Black,Spouse,50,+1234567896
+7,5008,POL018,Frank Blue,Child,25,+1234567897
+8,5009,POL019,Grace Yellow,Parent,25,+1234567898
+9,5010,POL020,Hank Red,Spouse,50,+1234567899

@@ -1,0 +1,11 @@
+,AppID,FirstName,LastName,LoanCategory,Amount,Date,AppStatus
+0,6001,John,Doe,Home,200000,2023-01-02,Accepted
+1,6002,Jane,Smith,Unsecured,5000,2023-05-02,On Hold
+2,6003,Alice,Johnson,Vehicle,15000,2023-10-02,Denied
+3,6004,Bob,White,Home,250000,2023-02-15,Accepted
+4,6005,Charlie,Brown,Unsecured,7000,2023-02-20,On Hold
+5,6006,David,Green,Vehicle,18000,2023-02-25,Denied
+6,6007,Eva,Black,Home,220000,2023-01-03,Accepted
+7,6008,Frank,Blue,Unsecured,6000,2023-05-03,On Hold
+8,6009,Grace,Yellow,Vehicle,17000,2023-10-03,Denied
+9,6010,Hank,Red,Home,210000,2023-03-15,Accepted

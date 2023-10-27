@@ -1,0 +1,2 @@
+AppID,FirstName,LastName,LoanCategory,Amount,Date,AppStatus
+ApplicationID,ApplicantName,ApplicantName,LoanType,RequestedAmount,ApplicationDate,Status

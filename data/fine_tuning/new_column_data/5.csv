@@ -1,0 +1,2 @@
+ID,HolderID,TypeOfClaim,DateOfClaim,AmountClaimed,StatusOfClaim,AgentID
+ClaimID,PolicyHolderID,ClaimType,ClaimDate,ClaimAmount,ClaimStatus,AssignedAgentID

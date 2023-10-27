@@ -1,0 +1,6 @@
+,AppID,FirstName,LastName,AppDate,LoanCategory,AmountRequested,Term_Years,Interest_Percent,JobStatus,YearlyIncome,Credit_Rating,Dependents,HouseStatus,AppStatus,LoanOfficerInitials
+0,A001,John,Doe,01.01.2023,House,200000,30,3.5,Employed,75000,750,2,Owner,Accepted,A
+1,A002,Jane,Smith,05.01.2023,Car,15000,5,4.0,Business Owner,90000,680,0,Tenant,On Hold,B
+2,A003,Alice,Johnson,10.01.2023,Personal,5000,3,5.0,Employed,85000,710,1,Owner,Denied,C
+3,A004,Bob,White,15.01.2023,Study,10000,10,3.0,Jobless,0,640,3,Tenant,On Hold,D
+4,A005,Charlie,Brown,20.01.2023,Journey,2000,1,6.0,Employed,65000,720,0,With Parents,Accepted,E

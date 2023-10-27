@@ -1,0 +1,6 @@
+,PolicyID,PolicyHolder,PolicyType,PolicyStartDate,PolicyEndDate,PremiumAmount,PremiumFrequency,CoverageAmount,Beneficiary,AgentName,LastClaimDate,TotalClaims,PolicyStatus,Deductible,Discounts
+0,P001,John Doe,Auto,2022-01-01,2023-01-01,1000,Annual,50000,Jane Doe,Agent A,NA,0,Active,500,Safe driver
+1,P002,Jane Smith,Home,2021-05-05,2022-05-05,500,Annual,200000,John Smith,Agent B,2022-06-05,1,Active,1000,Home security
+2,P003,Alice Johnson,Life,2020-03-10,2050-03-10,300,Annual,1000000,Bob Johnson,Agent C,NA,0,Active,0,None
+3,P004,Bob White,Health,2023-01-01,2024-01-01,200,Monthly,5000,Alice White,Agent D,NA,0,Active,50,Family plan
+4,P005,Charlie Brown,Travel,2023-01-20,2023-02-20,50,One-time,10000,John Brown,Agent E,NA,0,Expired,0,Early booking

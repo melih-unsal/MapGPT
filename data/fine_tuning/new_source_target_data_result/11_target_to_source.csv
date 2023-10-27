@@ -1,0 +1,11 @@
+,InsPolicyNo,FirstName,LastName,Coverage,Amount,DueOn,Frequency
+0,INS001,John,Doe,Vehicle,1200,2023-01-03,Monthly
+1,INS002,Jane,Smith,Property,800,2023-05-03,Monthly
+2,INS003,Alice,Johnson,Medical,600,2023-10-03,Monthly
+3,INS004,Bob,White,Vehicle,1200,2023-03-15,Monthly
+4,INS005,Charlie,Brown,Journey,300,2023-03-20,Yearly
+5,INS006,David,Green,Vehicle,1200,2023-03-25,Monthly
+6,INS007,Eva,Black,Property,800,2023-01-04,Monthly
+7,INS008,Frank,Blue,Medical,600,2023-05-04,Monthly
+8,INS009,Grace,Yellow,Journey,300,2023-10-04,Yearly
+9,INS010,Hank,Red,Vehicle,1200,2023-04-15,Monthly

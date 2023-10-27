@@ -1,0 +1,6 @@
+,CustomerID,FullName,DateOfBirth,CreditScore,EmploymentStatus,AnnualIncome,DebtAmount,NumberOfOpenCreditLines,NumberOfDerogatories,NumberOfRealEstateLoans,NumberOfDependents,HomeOwnership,AccountType,AccountBalance,LastTransactionDate
+0,101,John Doe,1985-01-15,750,Employed,75000,15000,5,0,1,2,Own,Savings,5000,2023-01-01
+1,102,Jane Smith,1990-05-20,680,Self-Employed,90000,20000,7,1,2,0,Rent,Checking,2000,2023-01-05
+2,103,Alice Johnson,1987-03-10,710,Employed,85000,10000,3,0,1,1,Own,Savings,10000,2023-01-10
+3,104,Bob White,1982-11-25,640,Unemployed,0,5000,2,2,0,3,Rent,Checking,50,2023-01-15
+4,105,Charlie Brown,1995-07-07,720,Employed,65000,0,4,0,1,0,Live with Parents,Savings,3000,2023-01-20

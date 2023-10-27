@@ -1,0 +1,11 @@
+,ApplicationID,ApplicantName,LoanType,RequestedAmount,ApplicationDate,Status
+0,6001,John Doe,Mortgage,200000,2023-02-01,Approved
+1,6002,Jane Smith,Personal,5000,2023-02-05,Pending
+2,6003,Alice Johnson,Auto,15000,2023-02-10,Rejected
+3,6004,Bob White,Mortgage,250000,2023-02-15,Approved
+4,6005,Charlie Brown,Personal,7000,2023-02-20,Pending
+5,6006,David Green,Auto,18000,2023-02-25,Rejected
+6,6007,Eva Black,Mortgage,220000,2023-03-01,Approved
+7,6008,Frank Blue,Personal,6000,2023-03-05,Pending
+8,6009,Grace Yellow,Auto,17000,2023-03-10,Rejected
+9,6010,Hank Red,Mortgage,210000,2023-03-15,Approved

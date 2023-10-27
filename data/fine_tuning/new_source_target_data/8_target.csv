@@ -1,0 +1,11 @@
+,EmployeeID,FullName,Position,BaseSalary,Bonus,LastPaymentDate,TaxCode
+0,4001,John Doe,Analyst,60000,5000,2023-01-31,A
+1,4002,Jane Smith,Manager,80000,7000,2023-01-31,B
+2,4003,Alice Johnson,Clerk,40000,1000,2023-01-31,A
+3,4004,Bob White,Analyst,60000,5000,2023-01-31,A
+4,4005,Charlie Brown,Director,100000,15000,2023-01-31,C
+5,4006,David Green,Manager,80000,7000,2023-01-31,B
+6,4007,Eva Black,Clerk,40000,1000,2023-01-31,A
+7,4008,Frank Blue,Director,100000,15000,2023-01-31,C
+8,4009,Grace Yellow,Analyst,60000,5000,2023-01-31,A
+9,4010,Hank Red,Manager,80000,7000,2023-01-31,B

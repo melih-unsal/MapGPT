@@ -2,9 +2,14 @@
 
 MapGPT is an innovative open-source tool designed to reformat your source table into a desired target format. It intelligently maps values from your source table while adopting column names and value styles/formats from the target table. This tool is incredibly useful for data scientists, analysts, and anyone who works with data in various formats.
 
+## ⚙️ Architecture
+### MapGPT Architecture
+![MapGPT Pipeline](mapgpt_pipeline.png)
+
+
 ## 🛠️ How It Works
 
-1. **Column Detection and Pruning**: MapGPT first identifies identical columns in the target table and prunes them, effectively reducing the number of parameters the model needs to manage.
+1. **Column Detection and Pruning**: MapGPT first identifies identical columns in the target table and prunes them, effectively reduces the number of parameters the model needs to manage.
 
 2. **RowModel Creation & Optimization**: The RowModel serves a crucial role in the data transformation process, where it autonomously formulates few-shot prompts by assimilating data from the target table. It initiates this by integrating the first row of the source table as an auxiliary input, subsequently relaying these consolidated data points to the Large Language Model (LLM).
 
@@ -31,6 +36,7 @@ Experience the live demo of MapGPT on our Streamlit app: [MapGPT Streamlit App](
 - User-driven customization options
 - Automated table transformation
 - Anti-hallucination and correlation understanding through innovative cell shuffling
+- Fine-tuning on the synthetic data and resulting model is ready on the Live Demo
 
 ## 💾 Installation
 
@@ -58,6 +64,38 @@ During the development of MapGPT, various models and approaches were experimente
 
 - **FeedbackCellModel**: Initially, users could only provide feedback on column mapping. The FeedbackCellModel was used to refine row results based on this input. However, for ease of use, the feedback system was adjusted to allow users to directly modify the generated single row result on the original dataframe.
 
+## To-Do 📝
+- [x] Target Column Modification for get rid of exact match search in RowModel
+- [x] Source to Target column mapping
+- [x] Paragraph to JSON
+- [x] JSON to Paragraph
+- [x] Using Paragraph to JSON and JSON to Paragraph models, refine the CellModel result using the transformation from paragraph to json in target row as an example, apply it on the source row. 
+- [x] Column mapping via Cell to Cells
+- [x] Hyperparameter optimization for few shot learning example count, randomization parameters in RowModel
+- [x] FeedbackRowModel for directly getting feedback for column mapping refining
+- [x] Model selection (**Streamlit**)
+- [x] Editable intermediate result (**Streamlit**)
+- [x] Editable Final Result (**Streamlit**)
+- [x] Download button (**Streamlit**)
+- [x] random column shuffle (to get rid of hallucination) (**RowModel**)
+- [x] random column removal (to get rid of hallucination) (**RowModel**)
+- [x] Different decoder usage for small and big tables (according to the column size) (**RowModel**)
+- [x] generated examples (**CellModel**)
+- [x] By using RowModel result as a gate for CellModel result get rid of possible hallucinations coming from CellModel (**ApplierModel**)
+- [x] Iterative generation not to exceed the token limit (**ApplierModel**)
+- [x] From single row result, apply one shot learning for efficient token usage (**ApplierModel**)
+- [x] Initial table pair prepared (14 pairs) (**Fine-tuning**)
+- [x] Data cleaning for source to target table transformation data (**Fine-tuning**)
+- [x] Column Mapping data preparation (**Fine-tuning**)
+- [x] Random column deleting (**Fine-tuning**)
+- [x] Column shuffling without changing the row orders to force the model to learn only the styles of the row rather than generating strongly based on column names  (**Fine-tuning**)
+- [x] Adding extra columns to the tables to make the model be aware of the fact that the same cell could be usable by the multiple columns in the target (**Fine-tuning**)
+- [x] use the same data in 2 ways (both source to target and target to source) (**Fine-tuning**)
+- [ ] Trying column transformation in target table at the beginning.
+- [ ] In CellModel, use gpt-based textual encoder for showing examples
+- [ ] Give some of the unique elements for each column during the generation of the rest of the rows
+- [ ] For larger tables (having more than 200 columns) generate the rows patch by patch
+- [ ] Fine-tune on the larger dataset.
 
 ## 🤝 Contribute
 

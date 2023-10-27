@@ -1,0 +1,11 @@
+,BeneID,PolicyNo,FirstName,LastName,Relation,Percentage,Phone
+0,5001,POL011,John,Doe,Husband,50,123-456-7890
+1,5002,POL012,Jane,Smith,Daughter,25,123-456-7891
+2,5003,POL013,Alice,Johnson,Mother,25,123-456-7892
+3,5004,POL014,Bob,White,Husband,50,123-456-7893
+4,5005,POL015,Charlie,Brown,Son,25,123-456-7894
+5,5006,POL016,David,Green,Father,25,123-456-7895
+6,5007,POL017,Eva,Black,Wife,50,123-456-7896
+7,5008,POL018,Frank,Blue,Son,25,123-456-7897
+8,5009,POL019,Grace,Yellow,Mother,25,123-456-7898
+9,5010,POL020,Hank,Red,Husband,50,123-456-7899

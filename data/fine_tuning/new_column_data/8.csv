@@ -1,0 +1,2 @@
+EmpID,FirstName,LastName,Role,Salary,BonusReceived,LastPaidOn,TaxBracket
+EmployeeID,FullName,FullName,Position,BaseSalary,Bonus,LastPaymentDate,TaxCode

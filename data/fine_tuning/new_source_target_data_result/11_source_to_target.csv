@@ -1,0 +1,11 @@
+,PolicyNumber,PolicyHolder,CoverageType,PremiumAmount,NextDueDate,PaymentFrequency
+0,INS001,John Doe,Auto,1200,2023-03-01,Monthly
+1,INS002,Jane Smith,Home,800,2023-03-05,Monthly
+2,INS003,Alice Johnson,Health,600,2023-03-10,Monthly
+3,INS004,Bob White,Auto,1200,2023-03-15,Monthly
+4,INS005,Charlie Brown,Travel,300,2023-03-20,Annually
+5,INS006,David Green,Auto,1200,2023-03-25,Monthly
+6,INS007,Eva Black,Home,800,2023-04-01,Monthly
+7,INS008,Frank Blue,Health,600,2023-04-05,Monthly
+8,INS009,Grace Yellow,Travel,300,2023-04-10,Annually
+9,INS010,Hank Red,Auto,1200,2023-04-15,Monthly

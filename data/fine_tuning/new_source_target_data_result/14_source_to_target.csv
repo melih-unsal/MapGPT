@@ -1,0 +1,11 @@
+,ApplicationID,ApplicantFullName,LoanCategory,RequestedAmount,ApplicationDate,CreditScore,EmploymentStatus,AnnualIncome,ExistingDebts,PropertyType,LoanPurpose,ReferenceContact,ApplicationStatus,AssignedAgent,Remarks
+0,7001,John Doe,Home,200000,2023-02-01,750,Employed,75000,5000,Owned,New Home,+1234567890,Approved,Agent A,Good credit history
+1,7002,Jane Smith,Unsecured,5000,2023-02-05,680,Self-Employed,85000,10000,Rented,Medical Bills,+1234567891,Pending,Agent B,Requires more documents
+2,7003,Alice Johnson,Vehicle,15000,2023-02-10,710,Employed,65000,3000,Owned,New Car,+1234567892,Rejected,Agent C,Low credit score
+3,7004,Bob White,Home,250000,2023-02-15,720,Unemployed,0,0,None,Refinance,N/A,Pending,Agent D,Unemployed - high risk
+4,7005,Charlie Brown,Unsecured,7000,2023-02-20,695,Employed,95000,2000,Owned,Travel,+1234567894,Approved,Agent E,High annual income
+5,7006,David Green,Vehicle,18000,2023-02-25,740,Self-Employed,90000,15000,Rented,Business Expansion,+1234567895,Rejected,Agent F,Existing debts too high
+6,7007,Eva Black,Home,220000,2023-03-01,660,Employed,70000,4000,Owned,Home Renovation,+1234567896,Approved,Agent G,Stable job
+7,7008,Frank Blue,Unsecured,6000,2023-03-05,700,Unemployed,0,0,None,Education,N/A,Pending,Agent H,No income source
+8,7009,Grace Yellow,Vehicle,17000,2023-03-10,725,Employed,80000,2500,Rented,Wedding,+1234567898,Rejected,Agent I,Short term employment
+9,7010,Hank Red,Home,210000,2023-03-15,735,Self-Employed,88000,12000,Owned,Debt Consolidation,+1234567899,Approved,Agent J,Multiple existing loans

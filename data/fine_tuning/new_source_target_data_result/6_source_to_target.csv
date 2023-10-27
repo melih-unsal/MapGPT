@@ -1,0 +1,11 @@
+,PortfolioID,InvestorName,InvestmentType,InvestmentName,InvestmentDate,CurrentValue,PurchasePrice,BrokerName
+0,3001,John Doe,Equity,AAPL,2021-01-15,1500,1200,Broker A
+1,3002,Jane Smith,Fixed Income,US Govt. Bond,2020-03-10,1000,1000,Broker B
+2,3003,Alice Johnson,Equity,MSFT,2021-05-20,1300,1100,Broker A
+3,3004,Bob White,Real Estate,Downtown Condo,2019-02-18,200000,190000,Broker C
+4,3005,Charlie Brown,Commodities,Gold,2020-04-29,1800,1600,Broker D
+5,3006,David Green,Equity,GOOGL,2021-01-01,1600,1400,Broker A
+6,3007,Eva Black,Fixed Income,Corporate Bond A,2020-06-15,1100,1100,Broker B
+7,3008,Frank Blue,Real Estate,Beach House,2019-11-11,250000,240000,Broker C
+8,3009,Grace Yellow,Commodities,Silver,2020-08-08,1700,1500,Broker D
+9,3010,Hank Red,Equity,NFLX,2021-03-03,1200,1000,Broker A

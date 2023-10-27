@@ -1,0 +1,11 @@
+,ID,FirstName,LastName,Type,Name,Date,CurrentVal,BoughtAt,Broker
+0,3001,John,Doe,Stocks,AAPL,15.01.2021,1500,1200,A
+1,3002,Jane,Smith,Bonds,USGB,10.03.2020,1000,1000,B
+2,3003,Alice,Johnson,Stocks,MSFT,20.05.2021,1300,1100,A
+3,3004,Bob,White,Property,Condo DT,18.02.2019,200000,190000,C
+4,3005,Charlie,Brown,Metals,Au,29.04.2020,1800,1600,D
+5,3006,David,Green,Stocks,GOOGL,01.01.2021,1600,1400,A
+6,3007,Eva,Black,Bonds,Corp Bond A,15.06.2020,1100,1100,B
+7,3008,Frank,Blue,Property,Beach Prop,11.11.2019,250000,240000,C
+8,3009,Grace,Yellow,Metals,Ag,08.08.2020,1700,1500,D
+9,3010,Hank,Red,Stocks,NFLX,03.03.2021,1200,1000,A

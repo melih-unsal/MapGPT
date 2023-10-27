@@ -1,0 +1,6 @@
+,CustID,FirstName,Surname,DOB,Credit_Rating,JobStatus,YearlyIncome,Debt,OpenCredits,DerogatoryMarks,RealEstateLoans,Dependents,HouseStatus,BankAccount,LastTransaction,Birth_Date,Transaction_Date,FullName
+0,101,John,Doe,15.01.1985,750,Employed,75000,15000,5,0,1,2,Owner,Savings,01.01.2023,15.01.1985,01.01.2023,John Doe
+1,102,Jane,Smith,20.05.1990,680,Business Owner,90000,20000,7,1,2,0,Tenant,Current,05.01.2023,20.05.1990,05.01.2023,Jane Smith
+2,103,Alice,Johnson,10.03.1987,710,Employed,85000,10000,3,0,1,1,Owner,Savings,10.01.2023,10.03.1987,10.01.2023,Alice Johnson
+3,104,Bob,White,25.11.1982,640,Jobless,0,5000,2,2,0,3,Tenant,Current,15.01.2023,25.11.1982,15.01.2023,Bob White
+4,105,Charlie,Brown,07.07.1995,720,Employed,65000,0,4,0,1,0,With Parents,Savings,20.01.2023,07.07.1995,20.01.2023,Charlie Brown

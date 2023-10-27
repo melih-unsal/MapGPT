@@ -1,0 +1,2 @@
+AppID,FirstName,LastName,LoanType,Amount,Date,CreditRating,JobStatus,YearlyIncome,Debts,HouseStatus,ReasonForLoan,RefContact,CurrentStatus,AgentAssigned,Notes
+ApplicationID,ApplicantFullName,ApplicantFullName,LoanCategory,RequestedAmount,ApplicationDate,CreditScore,EmploymentStatus,AnnualIncome,ExistingDebts,PropertyType,LoanPurpose,ReferenceContact,ApplicationStatus,AssignedAgent,Remarks

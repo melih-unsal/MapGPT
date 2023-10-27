@@ -15,7 +15,7 @@ os.environ["LANGCHAIN_ENDPOINT"]="https://api.smith.langchain.com"
 os.environ["LANGCHAIN_API_KEY"] = st.secrets.get("LANGCHAIN_API_KEY","")
 os.environ["LANGCHAIN_PROJECT"] = st.secrets.get("LANGCHAIN_PROJECT","")
 
-openai_api_key = st.sidebar.text_input(
+_ = """openai_api_key = st.sidebar.text_input(
     "OpenAI API Key",
     placeholder="sk-...",
     value=os.getenv("OPENAI_API_KEY", ""),
@@ -25,7 +25,10 @@ openai_api_key = st.sidebar.text_input(
 openai_api_base = st.sidebar.text_input(
     "Open AI base URL (Optional)",
     placeholder="https://api.openai.com/v1",
-)
+)"""
+
+openai_api_key = st.secrets.get("OPENAI_API_KEY",os.getenv("OPENAI_API_KEY",""))
+openai_api_base = st.secrets.get("OPENAI_API_BASE",os.getenv("OPENAI_API_BASE",""))
 
 models = (
     "gpt-3.5-turbo",
@@ -36,6 +39,7 @@ models = (
     "gpt-4",
     "gpt-4-0314",
     "gpt-4-0613",
+    "finetuned_model"
 )
 
 model_name = st.sidebar.selectbox("Model", models)   
@@ -92,7 +96,7 @@ with tables:
         st.subheader("Target")
         st.dataframe(st.session_state.target)      
 
-if st.session_state.get("source") is not None and st.session_state.get("target") is not None and st.session_state.get("stage",-1) != -1:
+if st.session_state.get("source") is not None and st.session_state.get("target") is not None and st.session_state.get("stage",-1) != -1 and model_name != "finetuned_model":
     if st.session_state.get("stage") == 0:
         st.session_state.agent.setTables(st.session_state.source, st.session_state.target)
         with st.spinner("Mapping Columns..."):
@@ -108,7 +112,18 @@ if st.session_state.get("source") is not None and st.session_state.get("target")
         st.session_state.edited_row = st.data_editor(after)
         st.info("""Greetings from MapGPT. Based on the provided source and target tables, I've made adjustments to the initial row. Please take a moment to review the table. If you wish to make corrections, simply click on any cell to modify its contents. Once you're satisfied with the updates, kindly click the 'Submit' button to finalize your changes. If no corrections are required, you may proceed by pressing 'Submit' directly.""") 
 
-if st.session_state.get("stage") == 1:
+if st.session_state.get("source") is not None and st.session_state.get("target") is not None and st.session_state.get("stage",-1) != -1 and model_name == "finetuned_model":
+    with st.spinner('Table is being created...'):
+        progress_text = "Final Table is being prepared..."
+        progress_bar = st.progress(0, text=progress_text)
+        data = None
+        for data, percentage in st.session_state.agent.getTableWithFinetunedModel():
+            progress_bar.progress(percentage, text=progress_text)
+        st.session_state.table = data 
+        st.session_state.stage = -1
+        st.rerun()
+
+if st.session_state.get("stage") == 1 and model_name != "finetuned_model":
     finalize_table = st.button("Submit")
         
     if finalize_table:

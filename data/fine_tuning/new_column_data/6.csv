@@ -1,0 +1,2 @@
+ID,FirstName,LastName,Type,Name,Date,CurrentVal,BoughtAt,Broker
+PortfolioID,InvestorName,InvestorName,InvestmentType,InvestmentName,InvestmentDate,CurrentValue,PurchasePrice,BrokerName

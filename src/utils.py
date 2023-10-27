@@ -188,7 +188,7 @@ def getExampleBig(row, columns, percentage=0.8):
     new_row = [str(row[i]) for i in indices]
     new_columns = [columns[i] for i in indices]
     json_row = {column:item for item,column in zip(new_row, new_columns)}
-    elements = [f"{col} is {cell}" for col,cell in json_row.items()]
+    elements = [f"{col} is {cell}" for col,cell in json_row.items() if str(cell)]
     elements = ", ".join(elements)
     return f"""
 Elements:  {elements}

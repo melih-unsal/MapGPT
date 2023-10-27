@@ -1,0 +1,11 @@
+,AppID,FirstName,LastName,LoanType,Amount,Date,CreditRating,JobStatus,YearlyIncome,Debts,HouseStatus,ReasonForLoan,RefContact,CurrentStatus,AgentAssigned,Notes
+0,7001,John,Doe,Mortgage,200000,2023-01-02,750,Full-Time,75000,5000,Owner,Buying House,123-456-7890,Accepted,Mr. A,Good credit
+1,7002,Jane,Smith,Personal,5000,2023-05-02,680,Business Owner,85000,10000,Tenant,Healthcare,123-456-7891,On Hold,Ms. B,Need more docs
+2,7003,Alice,Johnson,Car,15000,2023-10-02,710,Full-Time,65000,3000,Owner,Buying Vehicle,123-456-7892,Denied,Mr. C,Low score
+3,7004,Bob,White,Mortgage,250000,2023-02-15,720,No Job,0,0,N/A,Refinancing,N/A,On Hold,Ms. D,No job - high risk
+4,7005,Charlie,Brown,Personal,7000,2023-02-20,695,Full-Time,95000,2000,Owner,Vacation,123-456-7894,Accepted,Mr. E,High income
+5,7006,David,Green,Car,18000,2023-02-25,740,Business Owner,90000,15000,Tenant,Expand Business,123-456-7895,Denied,Ms. F,High debts
+6,7007,Eva,Black,Mortgage,220000,2023-01-03,660,Full-Time,70000,4000,Owner,House Repair,123-456-7896,Accepted,Mr. G,Stable employment
+7,7008,Frank,Blue,Personal,6000,2023-05-03,700,No Job,0,0,N/A,Study,N/A,On Hold,Ms. H,No income
+8,7009,Grace,Yellow,Car,17000,2023-10-03,725,Full-Time,80000,2500,Tenant,Marriage,123-456-7898,Denied,Mr. I,Short job duration
+9,7010,Hank,Red,Mortgage,210000,2023-03-15,735,Business Owner,88000,12000,Owner,Consolidate Debt,123-456-7899,Accepted,Ms. J,Many loans

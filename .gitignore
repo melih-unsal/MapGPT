@@ -36,6 +36,8 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
+data/fine_tuning_original/*
+
 # Unit test / coverage reports
 htmlcov/
 .tox/

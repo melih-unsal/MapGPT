@@ -1,0 +1,11 @@
+,PolicyNumber,PolicyHolderName,PolicyType,StartDate,EndDate,Premium,AgentAssigned
+0,POL001,John Doe,Auto,2021-01-15,2023-01-15,1000,Agent A
+1,POL002,Jane Smith,Home,2020-03-10,2022-03-10,500,Agent B
+2,POL003,Alice Johnson,Health,2021-05-20,2023-05-20,200,Agent A
+3,POL004,Bob White,Auto,2019-02-18,2021-02-18,1500,Agent C
+4,POL005,Charlie Brown,Travel,2020-04-29,2022-04-29,50,Agent D
+5,POL006,David Green,Auto,2021-01-01,2023-01-01,1200,Agent A
+6,POL007,Eva Black,Home,2020-06-15,2022-06-15,600,Agent B
+7,POL008,Frank Blue,Health,2019-11-11,2021-11-11,250,Agent C
+8,POL009,Grace Yellow,Travel,2020-08-08,2022-08-08,70,Agent D
+9,POL010,Hank Red,Auto,2021-03-03,2023-03-03,1300,Agent A

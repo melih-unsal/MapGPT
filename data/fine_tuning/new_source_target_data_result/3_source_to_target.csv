@@ -1,0 +1,6 @@
+,ApplicationID,ApplicantName,ApplicationDate,LoanType,RequestedAmount,LoanTerm,InterestRate,EmploymentStatus,AnnualIncome,CreditScore,NumberOfDependents,HomeOwnership,ApplicationStatus,LoanOfficer,Comments
+0,A001,John Doe,2023-01-01,Home,200000,30,3.5,Employed,75000,750,2,Own,Approved,Officer A,
+1,A002,Jane Smith,2023-01-05,Auto,15000,5,4,Self-Employed,90000,680,0,Rent,Pending,Officer B,
+2,A003,Alice Johnson,2023-01-10,Personal,5000,3,5,Employed,85000,710,1,Own,Rejected,Officer C,
+3,A004,Bob White,2023-01-15,Education,10000,10,3,Unemployed,0,640,3,Rent,Pending,Officer D,
+4,A005,Charlie Brown,2023-01-20,Travel,2000,1,6,Employed,65000,720,0,Live with Parents,Approved,Officer E,

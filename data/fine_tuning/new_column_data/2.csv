@@ -1,0 +1,2 @@
+InsPolicyID,FirstName,LastName,InsType,Start_Date,End_Date,Premium_Cost,PaymentFrequency,CoverageValue,BeneficiaryName,Agent,PreviousClaim,Total_Claims,Status,Deductions
+PolicyID,PolicyHolder,PolicyHolder,PolicyType,PolicyStartDate,PolicyEndDate,PremiumAmount,PremiumFrequency,CoverageAmount,Beneficiary,AgentName,LastClaimDate,TotalClaims,PolicyStatus,Deductible

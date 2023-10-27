@@ -21,6 +21,9 @@ class BaseModel:
                  human_template="",
                  name="Base Model"
                  ):
+        if model_name == "finetuned_model":
+            model_name = "ft:gpt-3.5-turbo-0613:invesya::8EIwnib4"
+        self.model_name = model_name
         self.llm = ChatOpenAI(
             model=model_name,
             openai_api_key=openai_api_key,
@@ -306,7 +309,19 @@ class RefinerModel(BaseModel):
             
         return intermediate_json
         
-        
+class FinetunedModel(BaseModel):
+    """Finetuned Model
+    """
+    def __init__(self, model_name="gpt-3.5-turbo", 
+                 openai_api_key = os.getenv("OPENAI_API_KEY",""),
+                 openai_api_base=""):
+        super().__init__(model_name, 
+                         openai_api_key, 
+                         openai_api_base,
+                         system_template = prompts.finetuned.system_template,
+                         human_template = prompts.finetuned.human_template,
+                         name="Finetuned Model"
+                         )       
     
 class ModelManager:
     def __init__(self,
@@ -351,6 +366,10 @@ class ModelManager:
         self.column_transformer_model = ColumnTransformerModel(model_name=model_name, 
                                                                openai_api_key=openai_api_key, 
                                                                openai_api_base=openai_api_base)
+        
+        self.finetuned_model = FinetunedModel(model_name=model_name, 
+                                              openai_api_key=openai_api_key, 
+                                              openai_api_base=openai_api_base)
         
         self.target_column_threshold = 20       # it is used to decide for the algorithm used in few shot prompt preparation.
         self.high_target_column_mapping = 30    # it is used to decide for the example count for CellModel
@@ -517,6 +536,27 @@ class ModelManager:
                                                    array2=transformed_source_first_row_df)
 
         return self.mappings
+    
+    def getTableWithFinetunedModel(self):
+        examples = self.target.iloc[:3].to_dict()
+        examples_str = json.dumps(examples)
+        rows = []
+        for i in range(self.source.shape[0]):
+            row = self.source.iloc[i].to_dict()
+            row = json.dumps(row)
+            result = self.finetuned_model(examples_str=examples_str,
+                                          source_str=row)
+            rows.append(result)
+            yield i, int(100*i/self.source.shape[0])
+            
+        table = pd.DataFrame(rows)
+        for k,cols in self.identical_columns.items():
+            for col in cols:
+                if col not in table.columns:
+                    table[col] = table[k]
+        table.fillna("",inplace=True)
+        yield table[self.original_columns], 100
+            
         
     def getTable(self, gt_row=None):
         if gt_row is None:

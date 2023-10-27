@@ -1,0 +1,2 @@
+CustID,FirstName,Surname,DOB,Credit_Rating,JobStatus,YearlyIncome,Debt,OpenCredits,DerogatoryMarks,RealEstateLoans,Dependents,HouseStatus,BankAccount,LastTransaction,Birth_Date,Transaction_Date,FullName
+CustomerID,FullName,FullName,DateOfBirth,CreditScore,EmploymentStatus,AnnualIncome,DebtAmount,NumberOfOpenCreditLines,NumberOfDerogatories,NumberOfRealEstateLoans,NumberOfDependents,HomeOwnership,AccountType,LastTransactionDate,DateOfBirth,LastTransactionDate,FullName

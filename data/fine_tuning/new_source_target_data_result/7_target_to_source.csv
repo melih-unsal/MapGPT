@@ -1,0 +1,11 @@
+,PolicyNo,FirstName,LastName,Type,Start_Date,End_Date,MonthlyPremium,Agent
+0,POL001,John,Doe,Vehicle,15.01.2021,15.01.2023,1000,A
+1,POL002,Jane,Smith,Property,10.03.2020,10.03.2022,500,B
+2,POL003,Alice,Johnson,Medical,20.05.2021,20.05.2023,200,A
+3,POL004,Bob,White,Vehicle,18.02.2019,18.02.2021,1500,C
+4,POL005,Charlie,Brown,Journey,29.04.2020,29.04.2022,50,D
+5,POL006,David,Green,Vehicle,01.01.2021,01.01.2023,1200,A
+6,POL007,Eva,Black,Property,15.06.2020,15.06.2022,600,B
+7,POL008,Frank,Blue,Medical,11.11.2019,11.11.2021,250,C
+8,POL009,Grace,Yellow,Journey,08.08.2020,08.08.2022,70,D
+9,POL010,Hank,Red,Vehicle,03.03.2021,03.03.2023,1300,A

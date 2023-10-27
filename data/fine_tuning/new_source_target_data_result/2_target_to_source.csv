@@ -1,0 +1,6 @@
+,InsPolicyID,FirstName,LastName,InsType,Start_Date,End_Date,Premium_Cost,PaymentFrequency,CoverageValue,BeneficiaryName,Agent,PreviousClaim,Total_Claims,Status,Deductions
+0,P001,John,Doe,Vehicle,01.01.2022,01.01.2023,1000,Yearly,50000,Jane Doe,A,NA,0,Active,500
+1,P002,Jane,Smith,Property,05.05.2021,05.05.2022,500,Yearly,200000,John Smith,B,05.06.2022,1,Active,1000
+2,P003,Alice,Johnson,Life,10.03.2020,10.03.2050,300,Yearly,1000000,Bob Johnson,C,NA,0,Active,0
+3,P004,Bob,White,Medical,01.01.2023,01.01.2024,200,Monthly,5000,Alice White,D,NA,0,Active,50
+4,P005,Charlie,Brown,Trip,20.01.2023,20.02.2023,50,Once,10000,John Brown,E,NA,0,Finished,0

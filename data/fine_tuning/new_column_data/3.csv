@@ -1,0 +1,2 @@
+AppID,FirstName,LastName,AppDate,LoanCategory,AmountRequested,Term_Years,Interest_Percent,JobStatus,YearlyIncome,Credit_Rating,Dependents,HouseStatus,AppStatus,LoanOfficerInitials
+ApplicationID,ApplicantName,ApplicantName,ApplicationDate,LoanType,RequestedAmount,LoanTerm,InterestRate,EmploymentStatus,AnnualIncome,CreditScore,NumberOfDependents,HomeOwnership,ApplicationStatus,LoanOfficer

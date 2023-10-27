@@ -1,0 +1,21 @@
+,AssetID,AssetType,AssetName,PurchaseDate,CurrentValue,PurchasePrice,OwnerID
+0,1,Stock,Apple Inc.,2020-01-15,1500,1200,101
+1,2,Bond,US Govt. Bond,2019-03-10,1000,1000,102
+2,3,Real Estate,Downtown Condo,2018-05-20,200000,190000,103
+3,4,Stock,Microsoft Corp.,2020-02-18,1300,1100,104
+4,5,Bond,Corporate Bond A,2019-04-29,1100,1100,105
+5,6,Stock,Tesla Inc.,2021-01-01,1700,1500,106
+6,7,Real Estate,Beach House,2017-06-15,250000,240000,107
+7,8,Stock,Amazon Inc.,2020-11-11,1400,1200,108
+8,9,Bond,Municipal Bond,2019-08-08,1050,1050,109
+9,10,Stock,Google LLC,2021-03-03,1600,1400,110
+10,11,Real Estate,Suburban House,2018-07-07,220000,210000,111
+11,12,Bond,US Govt. Bond,2019-09-09,1000,1000,112
+12,13,Stock,Netflix Inc.,2020-10-10,1200,1000,113
+13,14,Real Estate,Office Space,2017-12-12,300000,290000,114
+14,15,Stock,Facebook Inc.,2021-02-02,1550,1400,115
+15,16,Bond,Corporate Bond B,2019-05-05,1150,1150,116
+16,17,Stock,Nvidia Corp.,2020-06-06,1800,1600,117
+17,18,Real Estate,Rural Farmhouse,2018-04-04,210000,200000,118
+18,19,Stock,Adobe Inc.,2021-07-07,1650,1500,119
+19,20,Bond,US Govt. Bond,2019-11-11,1000,1000,120

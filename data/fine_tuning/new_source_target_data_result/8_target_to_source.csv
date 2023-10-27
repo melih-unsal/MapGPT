@@ -1,0 +1,11 @@
+,EmpID,FirstName,LastName,Role,Salary,BonusReceived,LastPaidOn,TaxBracket
+0,4001,John,Doe,Data Analyst,60000,5000,2023-01-31,Type A
+1,4002,Jane,Smith,Team Lead,80000,7000,2023-01-31,Type B
+2,4003,Alice,Johnson,Office Assistant,40000,1000,2023-01-31,Type A
+3,4004,Bob,White,Data Analyst,60000,5000,2023-01-31,Type A
+4,4005,Charlie,Brown,Dept. Head,100000,15000,2023-01-31,Type C
+5,4006,David,Green,Team Lead,80000,7000,2023-01-31,Type B
+6,4007,Eva,Black,Office Assistant,40000,1000,2023-01-31,Type A
+7,4008,Frank,Blue,Dept. Head,100000,15000,2023-01-31,Type C
+8,4009,Grace,Yellow,Data Analyst,60000,5000,2023-01-31,Type A
+9,4010,Hank,Red,Team Lead,80000,7000,2023-01-31,Type B

@@ -1,0 +1,11 @@
+,AssetID,AssetName,AssetType,PurchaseDate,CurrentValue,DepreciationRate,Location,Manager,LastMaintenanceDate,MaintenanceCost,InsuranceProvider,InsuranceExpiryDate,AssetStatus,Notes,ContactNumber
+0,7001,Building A,Real Estate,2019-01-15,500000,2.5,City A,John Doe,2021-01-15,5000,InsureCo,2023-01-15,Active,NA,+1234567890
+1,7002,Vehicle Fleet,Vehicle,2018-03-10,200000,10.0,City B,Jane Smith,2021-03-10,2000,SafeGuard,2023-03-10,Active,NA,+1234567891
+2,7003,Warehouse B,Real Estate,2020-05-20,300000,2.5,City A,Alice Johnson,2021-05-20,3000,InsureCo,2023-05-20,Under Repair,Undergoing roof repairs,+1234567892
+3,7004,Office Equipment,Equipment,2017-02-18,50000,15.0,City C,Bob White,2021-02-18,500,ProtectFirst,2023-02-18,Active,NA,+1234567893
+4,7005,Software Licenses,Software,2021-04-29,10000,20.0,City B,Charlie Brown,2021-04-29,1000,SafeGuard,2023-04-29,Active,License for 50 users,+1234567894
+5,7006,Building B,Real Estate,2016-01-01,600000,2.5,City A,David Green,2021-01-01,6000,InsureCo,2023-01-01,Active,NA,+1234567895
+6,7007,Machinery,Equipment,2018-06-15,150000,10.0,City B,Eva Black,2021-06-15,1500,ProtectFirst,2023-06-15,Under Repair,Belt replacement,+1234567896
+7,7008,Land Parcel C,Real Estate,2015-11-11,400000,2.5,City C,Frank Blue,2021-11-11,4000,SafeGuard,2023-11-11,Active,NA,+1234567897
+8,7009,Furniture Set,Equipment,2019-08-08,25000,15.0,City A,Grace Yellow,2021-08-08,250,InsureCo,2023-08-08,Active,NA,+1234567898
+9,7010,Computers,Equipment,2020-03-03,40000,20.0,City C,Hank Red,2021-03-03,400,ProtectFirst,2023-03-03,Under Repair,Software updates ongoing,+1234567899
