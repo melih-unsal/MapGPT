@@ -45,12 +45,13 @@ def getColumnGroups(df):
     all_columns = list(all_columns)
     return df.loc[:,all_columns], identical_columns 
 
-def prepareDFForCell(table, index=-1, another_table_json=None):
+def prepareDFForCell(table, index=-1,count=0):
     
-    if table.shape[1] > args.HIGH_TARGET_COLUMN_MAPPING:
-        count = args.CELL_MODEL_EXAMPLES_COUNT_BIG
-    else:
-        count = args.CELL_MODEL_EXAMPLES_COUNT_SMALL
+    if count == 0:
+        if table.shape[1] > args.HIGH_TARGET_COLUMN_MAPPING:
+            count = args.CELL_MODEL_EXAMPLES_COUNT_BIG
+        else:
+            count = args.CELL_MODEL_EXAMPLES_COUNT_SMALL
     
     table = getTable(table, index, count)
     # Check if the input is a pandas DataFrame
@@ -58,16 +59,11 @@ def prepareDFForCell(table, index=-1, another_table_json=None):
         raise ValueError("Input must be a pandas DataFrame")
     
     json_str = ""
-    
-    if another_table_json is not None:
-        another_table = dict2row(another_table_json)
-        no_empty_str_cols = another_table.columns[~another_table.apply(lambda col: col.astype(str).eq('').any())]
-        table = table[no_empty_str_cols]
         
-    for row in table.itertuples(index=False):
-        # Convert the row to a dictionary
-        row_dict = row._asdict()
-        json_str += json.dumps(row_dict) + "\n"
+    table_dict_list = table.to_dict('records')
+    
+    for row_dict in table_dict_list:
+        json_str += json.dumps(row_dict) + "\n\n"
     
     return json_str.strip()  # Remove the trailing newline if present
 

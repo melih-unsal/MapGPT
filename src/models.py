@@ -19,6 +19,7 @@ class BaseModel:
                  openai_api_base="",
                  system_template="", 
                  human_template="",
+                 is_json = True,
                  name="Base Model"
                  ):
         if model_name == "finetuned_model":
@@ -28,9 +29,11 @@ class BaseModel:
             model=model_name,
             openai_api_key=openai_api_key,
             temperature=0,
-            openai_api_base=openai_api_base
+            openai_api_base=openai_api_base,
+            request_timeout=120
         )
         self.name=name
+        self.is_json = is_json
         self.initChain(system_template, human_template)
         
     def initChain(self, system_template="", human_template=""):
@@ -43,9 +46,18 @@ class BaseModel:
         self.chain =  LLMChain(llm=self.llm, prompt=chat_prompt)
         print(f"{self.name} has been successfully initialized.")
         
-    def __call__(self, is_json=True, **kwargs):
+    def refineJson(self, json_string):
+        if "{" not in json_string or "}" not in json_string:
+            return "{}"
+        start_index = json_string.find("{")
+        end_index = json_string.rfind("}") + 1
+        return json_string[start_index:end_index]
+        
+    def __call__(self, **kwargs):
         res = self.chain.run(**kwargs)
-        if is_json:
+        if self.is_json:
+            res = self.refineJson(res)
+        if self.is_json:
             try:
                 res = json.loads(res)
             except json.JSONDecodeError:
@@ -249,11 +261,24 @@ class Json2ParagraphModel(BaseModel):
                          openai_api_base,
                          system_template = prompts.json2paragraph.system_template,
                          human_template = prompts.json2paragraph.human_template,
+                         is_json=False,
                          name="JSON To Paragraph Model"
+                         )    
+
+class Json2ParagraphSourceModel(BaseModel):
+    """By looking at the feedback coming from the user for the first row, generate the refined version.
+    """
+    def __init__(self, model_name="gpt-3.5-turbo", 
+                 openai_api_key = os.getenv("OPENAI_API_KEY",""),
+                 openai_api_base=""):
+        super().__init__(model_name, 
+                         openai_api_key, 
+                         openai_api_base,
+                         system_template = prompts.json2paragraph_source.system_template,
+                         human_template = prompts.json2paragraph_source.human_template,
+                         is_json=False,
+                         name="JSON To Paragraph Source Model"
                          )
-        
-    def __call__(self, **kwargs):
-        return super().__call__(is_json=False,**kwargs)
         
 class Paragraph2JsonModel(BaseModel):
     """By looking at the feedback coming from the user for the first row, generate the refined version.
@@ -308,7 +333,50 @@ class RefinerModel(BaseModel):
             print(e)
             
         return intermediate_json
+    
+class ColumnRenamerModel(BaseModel):
+    """It generates a new column names for the given table.
+    """
+    def __init__(self, model_name="gpt-3.5-turbo", 
+                 openai_api_key = os.getenv("OPENAI_API_KEY",""),
+                 openai_api_base=""):
+        super().__init__(model_name, 
+                         openai_api_key, 
+                         openai_api_base,
+                         system_template = prompts.column_renamer.system_template,
+                         human_template = prompts.column_renamer.human_template,
+                         name="Column Renamer Model"
+                         )
+
+class TargetTablePatternFinderModel(BaseModel):
+    """It finds the patterns of the given table.
+    """
+    def __init__(self, model_name="gpt-3.5-turbo", 
+                 openai_api_key = os.getenv("OPENAI_API_KEY",""),
+                 openai_api_base=""):
+        super().__init__(model_name, 
+                         openai_api_key, 
+                         openai_api_base,
+                         system_template = prompts.target_table_pattern_finder.system_template,
+                         human_template = prompts.target_table_pattern_finder.human_template,
+                         is_json=False,
+                         name="Target Table Pattern Finder Model"
+                         )
         
+class TargetTablePatternApplierModel(BaseModel):
+    """It applies the patterns to the other table.
+    """
+    def __init__(self, model_name="gpt-3.5-turbo", 
+                 openai_api_key = os.getenv("OPENAI_API_KEY",""),
+                 openai_api_base=""):
+        super().__init__(model_name, 
+                         openai_api_key, 
+                         openai_api_base,
+                         system_template = prompts.target_table_pattern_applier.system_template,
+                         human_template = prompts.target_table_pattern_applier.human_template,
+                         name="Target Table Pattern Applier Model"
+                         )
+
 class FinetunedModel(BaseModel):
     """Finetuned Model
     """
@@ -363,9 +431,29 @@ class ModelManager:
                                           openai_api_key=openai_api_key, 
                                           openai_api_base=openai_api_base)
         
+        self.json2paragraph_model = Json2ParagraphModel(model_name, 
+                                                        openai_api_key, 
+                                                        openai_api_base)
+        
+        self.json2paragraph_source_model = Json2ParagraphSourceModel(model_name, 
+                                                              openai_api_key, 
+                                                              openai_api_base)
+        
         self.column_transformer_model = ColumnTransformerModel(model_name=model_name, 
                                                                openai_api_key=openai_api_key, 
                                                                openai_api_base=openai_api_base)
+        
+        self.column_renamer_model = ColumnRenamerModel(model_name=model_name, 
+                                                       openai_api_key=openai_api_key, 
+                                                       openai_api_base=openai_api_base)
+        
+        self.target_table_pattern_finder_model = TargetTablePatternFinderModel(model_name=model_name, 
+                                                                               openai_api_key=openai_api_key, 
+                                                                               openai_api_base=openai_api_base)
+        
+        self.target_table_pattern_applier_model = TargetTablePatternApplierModel(model_name=model_name, 
+                                                                                 openai_api_key=openai_api_key, 
+                                                                                 openai_api_base=openai_api_base)
         
         self.finetuned_model = FinetunedModel(model_name=model_name, 
                                               openai_api_key=openai_api_key, 
@@ -495,6 +583,74 @@ class ModelManager:
         print(reformatted_row_json)           
                 
         transformed_df = dict2row(reformatted_row_json)
+        for k,cols in self.identical_columns.items():
+            for col in cols:
+                if col not in transformed_df.columns:
+                    transformed_df[col] = transformed_df[k]
+        self.transformed_df = transformed_df[self.original_columns]
+        row = getRowDF(self.source,0)
+        return {
+            "previous":row,
+            "after":self.transformed_df
+        }
+        
+    def getExamples(self, example_count = 3):
+        example_count = min(self.target.shape[0]-1, example_count)
+        examples = ""
+        for i in range(1,example_count+1):
+            row = self.target.iloc[i].to_dict()
+            paragraph = self.json2paragraph_model(data = row)
+            example = f"""
+Source: {paragraph}
+
+JSON:{row}            
+            """
+            examples += example + "\n"
+        
+        return examples , self.target.columns.to_list(), paragraph, row
+    
+    def getRow(self, index=0, example_paragraph="", example_json={}):
+        row = self.source.iloc[index].to_dict()
+        return self.json2paragraph_source_model(data = row, 
+                                                example_paragraph=example_paragraph,
+                                                example_json=example_json)
+    
+    def prepareDFForCell(self, index=0, count=3):
+        table_dict_list = self.target.to_dict('records')
+        table_dict_list = table_dict_list[index:index+count] # even if there is an out of bound, it is still safe
+        system_in = ""
+        keys = table_dict_list[0].keys()
+        for key in keys:
+            report = f"Key:{key}\nExamples:"
+            found = False
+            for table_dict in table_dict_list:
+                if table_dict[key]:
+                    found = True
+                    report += str(table_dict[key]) + ", " 
+            if found:
+                report = report[:-2]
+                system_in += report + "\n\n"
+        return system_in.strip()
+            
+    def getConfirmationMessageV3(self): 
+        column_mapping = self.column_renamer_model(column_names=self.target.columns.tolist(), rows=self.target.iloc[:2].to_json()) 
+        reverse_column_mapping = {v:k for k, v in column_mapping.items()}
+        self.target.rename(columns=column_mapping, inplace=True)
+        self.examples, self.target_columns, example_paragraph, example_json = self.getExamples(example_count=3)
+        
+        self.source_first_row_str = self.getRow(example_paragraph=example_paragraph, example_json=example_json)
+        self.transformed_source_first_row_json = self.row_model(examples=self.examples, columns=self.target_columns, row=self.source_first_row_str)
+        
+        patterns = self.target_table_pattern_finder_model(examples=self.prepareDFForCell(1))
+        reformatted_row_json = self.target_table_pattern_applier_model(patterns=patterns, json=self.transformed_source_first_row_json)
+
+        for col in self.target_columns:
+            if not self.transformed_source_first_row_json.get(col):
+                reformatted_row_json[col] = ""
+                
+        transformed_df = dict2row(reformatted_row_json)
+        transformed_df.rename(columns=reverse_column_mapping, inplace=True)
+        self.target.rename(columns=reverse_column_mapping, inplace=True)
         for k,cols in self.identical_columns.items():
             for col in cols:
                 if col not in transformed_df.columns:
